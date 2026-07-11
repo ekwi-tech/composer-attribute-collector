@@ -91,7 +91,28 @@ var_dump($attributes->propertyAttributes);
 
 Here are a few steps to get you started.
 
-### 1\. Configure the plugin (optional)
+### 1\. Mark collectable attributes
+
+For an attribute to be collected, it must be marked with the `#[CollectableAttribute]` attribute.
+This opt-in strategy ensures that only the attributes you're interested in are collected,
+improving performance and reducing noise.
+
+```php
+<?php
+
+namespace App\Attribute;
+
+use Attribute;
+use olvlvl\ComposerAttributeCollector\CollectableAttribute;
+
+#[CollectableAttribute]
+#[Attribute(Attribute::TARGET_CLASS)]
+final class MyAttribute
+{
+}
+```
+
+### 2\. Configure the plugin (optional)
 
 The collector automatically scans `autoload` paths of the root `composer.json` for a
 zero-configuration experience. You can override them via
@@ -250,7 +271,8 @@ PHP. If the plugin is too slow for your liking, try running the command with
 To speed up the collection process, the plugin first looks at PHP files as plain text for hints of
 attribute usage. If a class inherits its attributes from traits, properties, or methods, but doesn't
 use attributes itself, it will be ignored. Use the attribute
-`[#\olvlvl\ComposerAttributeCollector\InheritsAttributes]` to force the collection.
+`#[olvlvl\ComposerAttributeCollector\InheritsAttributes]` to force the collection.
+Note that the attributes you want to collect must still be marked with `#[CollectableAttribute]`.
 
 ```php
 trait UrlTrait
