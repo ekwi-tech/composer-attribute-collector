@@ -3,7 +3,9 @@
 namespace Acme\Attribute;
 
 use Attribute;
+use olvlvl\ComposerAttributeCollector\CollectableAttribute;
 
+#[CollectableAttribute]
 #[Attribute(flags: Attribute::TARGET_CLASS)]
 final class AutowiredService
 {

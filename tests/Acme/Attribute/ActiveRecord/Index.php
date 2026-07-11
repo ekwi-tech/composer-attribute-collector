@@ -3,12 +3,14 @@
 namespace Acme\Attribute\ActiveRecord;
 
 use Attribute;
+use olvlvl\ComposerAttributeCollector\CollectableAttribute;
 
 /**
  * An index on one or multiple columns.
  *
  * @readonly
  */
+#[CollectableAttribute]
 #[Attribute(Attribute::TARGET_CLASS)]
 final class Index implements SchemaAttribute
 {
