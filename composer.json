@@ -30,7 +30,7 @@
     "sort-packages": true
   },
   "require": {
-    "php": ">=8.0",
+    "php": ">=8.4",
     "composer-plugin-api": ">=2.3",
     "composer/class-map-generator": "^1.4"
   },

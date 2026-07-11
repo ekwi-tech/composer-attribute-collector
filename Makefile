@@ -32,26 +32,8 @@ test-cleanup:
 	@rm -rf tests/sandbox/*
 
 .PHONY: test-container
-test-container: test-container80
-
-.PHONY: test-container80
-test-container80:
-	@-docker compose run --rm app80 bash
-	@docker compose down -v
-
-.PHONY: test-container81
-test-container81:
-	@-docker-compose run --rm app81 bash
-	@docker-compose down -v
-
-.PHONY: test-container82
-test-container82:
-	@-docker compose run --rm app82 bash
-	@docker compose down -v
-
-.PHONY: test-container85
-test-container85:
-	@-docker compose run --rm app85 bash
+test-container:
+	@docker compose run --rm app make test
 	@docker compose down -v
 
 .PHONY: lint
