@@ -9,7 +9,6 @@ use ReflectionException;
 
 /**
  * @internal
- * @readonly
  */
 class ClassAttributeCollector
 {
@@ -21,7 +20,7 @@ class ClassAttributeCollector
     private array $collectableAttributes = [];
 
     public function __construct(
-        private Logger $log,
+        private readonly Logger $log,
     ) {
     }
 
