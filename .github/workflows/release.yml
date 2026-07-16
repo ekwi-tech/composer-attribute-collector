@@ -1,7 +1,7 @@
 # Cut a release of this Composer package.
 #
-# A Composer package is published by its GIT TAG: Packagist and any `type: vcs` repository entry (this is
-# how ekwi-core consumes the fork) resolve versions straight from the tags. There is therefore no artifact
+# A Composer package is published by its GIT TAG: Packagist and any `type: vcs` repository entry (how a
+# private consuming application resolves the fork) resolve versions straight from the tags. There is no artifact
 # registry to deploy to — publishing == creating the tag + GitHub Release. This makes the pipeline far
 # simpler than the Maven equivalent: derive the version, gate on a green CI, tag, publish notes.
 #
@@ -54,7 +54,7 @@ jobs:
 
       # DERIVES the version from Conventional Commits since the last stable tag. With no tag yet (the fork
       # starts its own version line), it emits `initial-version`. 2.2.0 keeps semver continuity with
-      # upstream olvlvl v2.1.2 + the CollectableAttribute feature, so ekwi-core's `^2.2` resolves cleanly.
+      # upstream olvlvl v2.1.2 + the CollectableAttribute feature, so a consumer's `^2.2` resolves cleanly.
       - name: Compute the next version
         id: version
         uses: ekwi-tech/next-version-action@515501e62443c438fe6473cf91b54e34627d3f99 # v0.1.0-beta.1
@@ -101,7 +101,7 @@ jobs:
           args: --unreleased --tag v${{ steps.version.outputs.version }} --strip all
 
       # gh release create creates the tag atomically via the API, pointing at the tested commit. Packagist /
-      # the VCS repository entry in ekwi-core pick the version up from this tag; there is nothing else to push.
+      # a consumer's VCS repository entry picks the version up from this tag; there is nothing else to push.
       - name: Publish GitHub Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -6,8 +6,9 @@ version: 2
 # because Dependabot security updates are enabled on the repo (Settings → Code security) and raise a PR the
 # day an advisory lands. The two are one decision — do not slow the cadence without that channel.
 #
-# `assignees:` says the PR is owned by automation's reviewer. WHO REVIEWS it is answered by CODEOWNERS
-# (GitHub removed dependabot.yml's `reviewers:` on 2025-08-08).
+# `assignees: ekwi-bot` marks the PR as owned by automation, not a person — Dependabot honours the field
+# only for an account with write access, which is exactly what ekwi-bot's write bit is for. WHO REVIEWS is
+# answered by CODEOWNERS (GitHub removed dependabot.yml's `reviewers:` on 2025-08-08).
 updates:
   # PHP dependencies declared in the root composer.json (the cases/* are throwaway fixtures).
   - package-ecosystem: composer
@@ -15,7 +16,7 @@ updates:
     schedule:
       interval: monthly
     assignees:
-      - ssylla
+      - ekwi-bot
     open-pull-requests-limit: 5
     commit-message:
       prefix: build          # Conventional Commits type — accepted by commitlint.yml
@@ -32,7 +33,7 @@ updates:
     schedule:
       interval: monthly
     assignees:
-      - ssylla
+      - ekwi-bot
     commit-message:
       prefix: ci
     groups:

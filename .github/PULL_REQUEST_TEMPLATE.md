@@ -4,8 +4,8 @@
 
 ## Blast radius
 
-<!-- This package is a Composer plugin consumed by ekwi-core (it replaces olvlvl/composer-attribute-collector).
-     Say what a consumer sees on the next release:
+<!-- This package is a Composer plugin that replaces olvlvl/composer-attribute-collector for downstream
+     applications. Say what a consumer sees on the next release:
 
      - Public API change? (Attributes::find*, the collected attributes contract)
      - Plugin behaviour change a consumer notices at build/dump-autoload time?
