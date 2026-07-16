@@ -1,0 +1,120 @@
+# Cut a release of this Composer package.
+#
+# A Composer package is published by its GIT TAG: Packagist and any `type: vcs` repository entry (this is
+# how ekwi-core consumes the fork) resolve versions straight from the tags. There is therefore no artifact
+# registry to deploy to — publishing == creating the tag + GitHub Release. This makes the pipeline far
+# simpler than the Maven equivalent: derive the version, gate on a green CI, tag, publish notes.
+#
+# The version is DERIVED from the Conventional Commits since the last stable tag, never typed by hand — a
+# hand-typed version is a claim about the diff that nothing checks. The caller decides one thing: beta or
+# stable. Policy lives once in ekwi-tech/next-version-action, pinned by SHA.
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      prerelease:
+        description: 'Cut a pre-release (X.Y.Z-beta.N) rather than a stable X.Y.Z.'
+        required: true
+        default: true
+        type: boolean
+
+# No workflow-wide token: each job takes only what it needs.
+permissions: {}
+
+# The version is derived, not supplied, so the group cannot key on it. One release at a time, and never
+# cancel one in flight: it could be interrupted between `gh release create` and the tag becoming visible.
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Tag and publish the release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # create the git tag + GitHub Release
+      actions: read     # read CI runs for the green-build gate below
+
+    steps:
+      - name: Refuse to release from a branch other than main
+        run: |
+          if [ "${GITHUB_REF_NAME}" != "main" ]; then
+            echo "::error::Releases are cut from main only — this run targets '${GITHUB_REF_NAME}'"
+            exit 1
+          fi
+
+      # fetch-depth: 0 gives the version policy and git-cliff every tag and the full commit graph — the
+      # next-version action refuses a shallow clone. persist-credentials: false keeps the GITHUB_TOKEN out
+      # of .git/config, where later third-party actions (git-cliff) could otherwise read it.
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      # DERIVES the version from Conventional Commits since the last stable tag. With no tag yet (the fork
+      # starts its own version line), it emits `initial-version`. 2.2.0 keeps semver continuity with
+      # upstream olvlvl v2.1.2 + the CollectableAttribute feature, so ekwi-core's `^2.2` resolves cleanly.
+      - name: Compute the next version
+        id: version
+        uses: ekwi-tech/next-version-action@515501e62443c438fe6473cf91b54e34627d3f99 # v0.1.0-beta.1
+        with:
+          prerelease: ${{ inputs.prerelease }}
+          initial-version: '2.2.0'
+
+      - name: Refuse to overwrite an existing tag
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          if git rev-parse -q --verify "refs/tags/v${VERSION}" >/dev/null; then
+            echo "::error::Tag v${VERSION} already exists"
+            exit 1
+          fi
+
+      # Defence in depth behind the ruleset (which requires PRs to merge). This refuses to tag a commit that
+      # has not passed CI — catching a required check re-run RED after merge, or any bypass. A release must
+      # have every correctness workflow green for THIS exact commit.
+      - name: Require a successful CI run on this commit
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          SHA="$(git rev-parse HEAD)"
+          for wf in test.yml quality.yml cases.yml; do
+            ok="$(gh api \
+              "/repos/${GITHUB_REPOSITORY}/actions/workflows/${wf}/runs?head_sha=${SHA}" \
+              --jq '[.workflow_runs[] | select(.conclusion == "success")] | length')"
+            if [ "${ok}" -eq 0 ]; then
+              echo "::error::No successful '${wf}' run for ${SHA} — refusing to release an untested commit"
+              exit 1
+            fi
+            echo "  ${wf}: green for ${SHA}"
+          done
+
+      # The release body is the DELTA since the last tag, and only that. --unreleased selects those commits,
+      # --tag names the version, --strip all drops the header/footer. Full history is the /releases page.
+      - name: Generate release notes with git-cliff
+        id: notes
+        uses: orhun/git-cliff-action@f50e11560dce63f7c33227798f90b924471a88b5 # v4
+        with:
+          config: cliff.toml
+          args: --unreleased --tag v${{ steps.version.outputs.version }} --strip all
+
+      # gh release create creates the tag atomically via the API, pointing at the tested commit. Packagist /
+      # the VCS repository entry in ekwi-core pick the version up from this tag; there is nothing else to push.
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.version.outputs.version }}
+          NOTES_FILE: ${{ steps.notes.outputs.changelog }}
+        run: |
+          # A version carrying a pre-release identifier (a hyphen) ships as a GitHub pre-release, so it is
+          # never surfaced as "latest": a consumer only picks up a beta by targeting its tag explicitly.
+          prerelease_flag=""
+          case "$VERSION" in *-*) prerelease_flag="--prerelease" ;; esac
+
+          gh release create "v${VERSION}" \
+            --target "$(git rev-parse HEAD)" \
+            --title "composer-attribute-collector v${VERSION}" \
+            --notes-file "${NOTES_FILE}" \
+            $prerelease_flag

@@ -1,0 +1,19 @@
+# Code ownership for the ekwi fork of composer-attribute-collector.
+#
+# The only place that decides WHO REVIEWS a change, whoever opens it — Dependabot included: GitHub removed
+# dependabot.yml's `reviewers:` option on 2025-08-08 and pointed everyone here. The `assignees:` still in
+# that file answers a different question (the PR is owned by automation) and does not belong here.
+#
+# ⚠ THIS REQUESTS THE REVIEW; IT DOES NOT REQUIRE ONE.
+#
+# The repo ruleset sets `required_approving_review_count: 0`, because there is currently ONE engineer here.
+# Requiring an approval would leave two outcomes: he is blocked on his own PRs (GitHub forbids
+# self-approval), or someone rubber-stamps code they did not review. What the flow DOES require is a PR and
+# a green CI.
+#
+# THE TRIGGER TO FLIP THIS — the day a second engineer can review here:
+#   1. Create the team @ekwi-tech/cac-maintainers with both of them.
+#   2. Replace @ssylla below with @ekwi-tech/cac-maintainers.
+#   3. In the ruleset, set: required_approving_review_count: 1, require_code_owner_review: true,
+#      require_last_push_approval: true
+* @ssylla

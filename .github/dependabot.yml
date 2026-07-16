@@ -1,24 +1,41 @@
 version: 2
-updates:
-  - package-ecosystem: "composer"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "03:00"
-    assignees:
-      - "olvlvl"
-    commit-message:
-      prefix: "build(deps)"
-      include: "scope"
 
-  - package-ecosystem: "github-actions"
+# ekwi fork configuration (replaces the upstream defaults, which assigned to @olvlvl and ran weekly).
+#
+# Monthly, not weekly: routine bumps here are hygiene, not urgency. The 30-day window is acceptable ONLY
+# because Dependabot security updates are enabled on the repo (Settings → Code security) and raise a PR the
+# day an advisory lands. The two are one decision — do not slow the cadence without that channel.
+#
+# `assignees:` says the PR is owned by automation's reviewer. WHO REVIEWS it is answered by CODEOWNERS
+# (GitHub removed dependabot.yml's `reviewers:` on 2025-08-08).
+updates:
+  # PHP dependencies declared in the root composer.json (the cases/* are throwaway fixtures).
+  - package-ecosystem: composer
     directory: "/"
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "03:30"
+      interval: monthly
     assignees:
-      - "olvlvl"
+      - ssylla
+    open-pull-requests-limit: 5
     commit-message:
-      prefix: "ci"
+      prefix: build          # Conventional Commits type — accepted by commitlint.yml
+    # Collapse routine minor/patch bumps into a single PR; a major bump lands on its own PR for scrutiny.
+    groups:
+      composer-minor-patch:
+        update-types:
+          - minor
+          - patch
+
+  # GitHub Actions used by the workflows. Keeps the SHA-pinned actions current.
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: monthly
+    assignees:
+      - ssylla
+    commit-message:
+      prefix: ci
+    groups:
+      actions-all:
+        patterns:
+          - "*"
