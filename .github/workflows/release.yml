@@ -72,15 +72,20 @@ jobs:
           fi
 
       # Defence in depth behind the ruleset (which requires PRs to merge). This refuses to tag a commit that
-      # has not passed CI — catching a required check re-run RED after merge, or any bypass. A release must
-      # have every correctness workflow green for THIS exact commit.
+      # has not passed CI — catching a required check re-run RED after merge, or any bypass. The gate covers
+      # the workflows that test OUR code (test.yml, quality.yml) for THIS exact commit.
+      #
+      # cases.yml is deliberately NOT gated: it installs pinned third-party fixtures (Symfony, Laravel) whose
+      # dependencies drift under external security advisories, so it goes red for reasons unrelated to this
+      # package's correctness and outside our control. Gating a release on it would let an upstream advisory
+      # freeze our releases. It still runs on push as an integration signal — it just does not block a tag.
       - name: Require a successful CI run on this commit
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
           SHA="$(git rev-parse HEAD)"
-          for wf in test.yml quality.yml cases.yml; do
+          for wf in test.yml quality.yml; do
             ok="$(gh api \
               "/repos/${GITHUB_REPOSITORY}/actions/workflows/${wf}/runs?head_sha=${SHA}" \
               --jq '[.workflow_runs[] | select(.conclusion == "success")] | length')"
