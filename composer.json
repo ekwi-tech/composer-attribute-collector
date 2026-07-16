@@ -1,14 +1,19 @@
 {
-  "name": "olvlvl/composer-attribute-collector",
+  "name": "ekwi-tech/composer-attribute-collector",
   "type": "composer-plugin",
-  "description": "A convenient and near zero-cost way to retrieve targets of PHP 8 attributes",
+  "description": "A convenient and near zero-cost way to retrieve targets of PHP 8 attributes (ekwi fork of olvlvl/composer-attribute-collector)",
   "license": "BSD-3-Clause",
   "authors": [
     {
       "name": "Olivier Laviale",
       "email": "olivier.laviale@gmail.com",
       "homepage": "https://olvlvl.com/",
-      "role": "Developer"
+      "role": "Original author"
+    },
+    {
+      "name": "ekwi",
+      "homepage": "https://github.com/ekwi-tech",
+      "role": "Fork maintainer"
     }
   ],
   "autoload": {
@@ -38,6 +43,9 @@
     "composer/composer": ">=2.3",
     "phpstan/phpstan": "^2.1.17",
     "phpunit/phpunit": "^9.6.23"
+  },
+  "replace": {
+    "olvlvl/composer-attribute-collector": "self.version"
   },
   "extra": {
     "class": "olvlvl\\ComposerAttributeCollector\\Plugin",

@@ -1,0 +1,21 @@
+# Code ownership for the ekwi fork of composer-attribute-collector.
+#
+# The only place that decides WHO REVIEWS a change, whoever opens it — Dependabot included: GitHub removed
+# dependabot.yml's `reviewers:` option on 2025-08-08 and pointed everyone here. The `assignees:` still in
+# that file answers a different question (the PR is owned by ekwi-bot, automation) and does not belong here.
+#
+# ⚠ THIS REQUESTS THE REVIEW; IT DOES NOT REQUIRE ONE.
+#
+# The repo ruleset currently sets `required_approving_review_count: 0`. With two code owners now listed,
+# mutual review is possible — GitHub forbids self-approval, but each owner can review the other's PRs — so
+# requiring an approval no longer risks blocking a solo author on their own work. Until the ruleset is
+# flipped, the flow requires only a PR and a green CI.
+#
+# TO ENFORCE REVIEW — the precondition (a second reviewer) is now met:
+#   1. Optionally group the owners as a team @ekwi-tech/cac-maintainers and use it below.
+#   2. In the ruleset, set: required_approving_review_count: 1, require_code_owner_review: true,
+#      require_last_push_approval: true
+#
+# Both owners MUST be on ONE line: CODEOWNERS applies only the LAST matching pattern, so two separate `*`
+# lines would silently drop the first owner. Both names, one rule.
+* @ssylla @pqueyroi
