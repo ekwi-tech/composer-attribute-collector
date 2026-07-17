@@ -8,7 +8,7 @@
 # The version is DERIVED from the Conventional Commits since the last stable tag, never typed by hand — a
 # hand-typed version is a claim about the diff that nothing checks. The caller decides one thing: pre-release
 # or latest. Policy lives once in ekwi-tech/next-version-action, pinned by SHA.
-name: Release
+name: _Ekwi — Release
 
 on:
   workflow_dispatch:

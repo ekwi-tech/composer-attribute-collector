@@ -29,7 +29,7 @@
 #     - CI_APP_PRIVATE_KEY : the App's private key (.pem contents)
 #   Required App repository permissions:
 #     - Contents: read/write, Pull requests: read/write, Workflows: read/write
-name: Sync upstream
+name: _Ekwi — Sync upstream
 
 on:
   schedule:
