@@ -1,4 +1,4 @@
-name: Semantic PR Title
+name: _Ekwi — Semantic PR Title
 
 # The release notes (release-notes-action) and the derived version (next-version-action) read Conventional Commits.
 # This check enforces a Conventional Commit PR title so every merged change is classifiable: keep the
