@@ -3,3 +3,7 @@
 build
 composer.lock
 vendor
+
+# IDE / editor config
+.idea
+.vscode
