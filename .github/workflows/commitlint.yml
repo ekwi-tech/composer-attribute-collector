@@ -1,6 +1,6 @@
 name: Semantic PR Title
 
-# The release notes (git-cliff) and the derived version (next-version-action) read Conventional Commits.
+# The release notes (release-notes-action) and the derived version (next-version-action) read Conventional Commits.
 # This check enforces a Conventional Commit PR title so every merged change is classifiable: keep the
 # individual commits conventional too, or squash to the title. (The upstream-sync PR title
 # `chore: sync upstream (...)` is conventional all the same.)
@@ -20,7 +20,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          # Allowed commit types — mirrors cliff.toml commit_parsers.
+          # Allowed commit types — mirrors the commit_parsers in release-notes-action's cliff.toml.
           types: |
             feat
             fix
