@@ -1,13 +1,8 @@
-# Cut a release of this Composer package.
+# Cut a release of this Composer package. A Composer package is published by its GIT TAG — Packagist and any
+# `type: vcs` entry resolve versions from the tags, so there is no registry to deploy to.
 #
-# A Composer package is published by its GIT TAG: Packagist and any `type: vcs` repository entry (how a
-# private consuming application resolves the fork) resolve versions straight from the tags. There is no artifact
-# registry to deploy to — publishing == creating the tag + GitHub Release. This makes the pipeline far
-# simpler than the Maven equivalent: derive the version, gate on a green CI, tag, publish notes.
-#
-# The version is DERIVED from the Conventional Commits since the last stable tag, never typed by hand — a
-# hand-typed version is a claim about the diff that nothing checks. The caller decides one thing: pre-release
-# or latest. Policy lives once in ekwi-tech/next-version-action, pinned by SHA.
+# The release orchestration lives once in ekwi-tech/release-workflow (pinned by SHA); this is the thin caller,
+# carrying only what is specific to this repo: the first-release version and which CI workflows gate a tag.
 name: _Ekwi — Release
 
 on:
@@ -22,110 +17,23 @@ on:
           - pre-release
           - latest
 
-# No workflow-wide token: each job takes only what it needs.
 permissions: {}
 
-# The version is derived, not supplied, so the group cannot key on it. One release at a time, and never
-# cancel one in flight: it could be interrupted between `gh release create` and the tag becoming visible.
-concurrency:
-  group: release
-  cancel-in-progress: false
-
+# No concurrency block — the "one release at a time" guard is centralised in the reusable workflow.
 jobs:
   release:
-    name: Tag and publish the release
-    runs-on: ubuntu-latest
+    # The caller owns the token scope; the reusable declares none and inherits this grant.
     permissions:
-      contents: write        # create the git tag + GitHub Release
-      actions: read          # read CI runs for the green-build gate below
-      pull-requests: read    # release-notes-action resolves each commit's PR author/number for the notes
-
-    steps:
-      - name: Refuse to release from a branch other than main
-        run: |
-          if [ "${GITHUB_REF_NAME}" != "main" ]; then
-            echo "::error::Releases are cut from main only — this run targets '${GITHUB_REF_NAME}'"
-            exit 1
-          fi
-
-      # fetch-depth: 0 — both the version policy and release-notes-action read every tag and the full commit
-      # graph, and refuse a shallow clone. persist-credentials: false keeps GITHUB_TOKEN out of .git/config; the
-      # notes action takes its token explicitly via its `token` input.
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-
-      # DERIVES the version from Conventional Commits since the last stable tag. With no tag yet (the fork
-      # starts its own version line), it emits `initial-version`. 2.2.0 keeps semver continuity with
-      # upstream olvlvl v2.1.2 + the CollectableAttribute feature, so a consumer's `^2.2` resolves cleanly.
-      - name: Compute the next version
-        id: version
-        uses: ekwi-tech/next-version-action@e3a828a0165905c0719df3f79f8cdb5be93336d6 # v0.1.0
-        with:
-          # next-version-action's contract stays boolean; the dropdown maps to it here.
-          prerelease: ${{ inputs.channel == 'pre-release' }}
-          initial-version: '2.2.0'
-
-      - name: Refuse to overwrite an existing tag
-        env:
-          VERSION: ${{ steps.version.outputs.version }}
-        run: |
-          if git rev-parse -q --verify "refs/tags/v${VERSION}" >/dev/null; then
-            echo "::error::Tag v${VERSION} already exists"
-            exit 1
-          fi
-
-      # Defence in depth behind the ruleset (which requires PRs to merge). This refuses to tag a commit that
-      # has not passed CI — catching a required check re-run RED after merge, or any bypass. The gate covers
-      # the workflows that test OUR code (test.yml, quality.yml) for THIS exact commit.
-      #
-      # cases.yml is deliberately NOT gated: it installs pinned third-party fixtures (Symfony, Laravel) whose
-      # dependencies drift under external security advisories, so it goes red for reasons unrelated to this
-      # package's correctness and outside our control. Gating a release on it would let an upstream advisory
-      # freeze our releases. It still runs on push as an integration signal — it just does not block a tag.
-      - name: Require a successful CI run on this commit
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -euo pipefail
-          SHA="$(git rev-parse HEAD)"
-          for wf in test.yml quality.yml; do
-            ok="$(gh api \
-              "/repos/${GITHUB_REPOSITORY}/actions/workflows/${wf}/runs?head_sha=${SHA}" \
-              --jq '[.workflow_runs[] | select(.conclusion == "success")] | length')"
-            if [ "${ok}" -eq 0 ]; then
-              echo "::error::No successful '${wf}' run for ${SHA} — refusing to release an untested commit"
-              exit 1
-            fi
-            echo "  ${wf}: green for ${SHA}"
-          done
-
-      # The release body is the DELTA since the last tag, and only that — generated by the fleet's
-      # release-notes-action, which carries the canonical cliff.toml and the pinned git-cliff so this repo
-      # carries neither. Pinned by SHA, bumped by Dependabot.
-      - name: Generate release notes
-        id: notes
-        uses: ekwi-tech/release-notes-action@7d1b76089de232d7c0c690fd5603e3ed1083a08d # v0.1.0
-        with:
-          version: ${{ steps.version.outputs.version }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      # gh release create creates the tag atomically via the API, pointing at the tested commit. Packagist /
-      # a consumer's VCS repository entry picks the version up from this tag; there is nothing else to push.
-      - name: Publish GitHub Release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: ${{ steps.version.outputs.version }}
-          NOTES_FILE: ${{ steps.notes.outputs.notes-file }}
-        run: |
-          # A version carrying a pre-release identifier (a hyphen) ships as a GitHub pre-release, so it is
-          # never surfaced as "latest": a consumer only picks up a beta by targeting its tag explicitly.
-          prerelease_flag=""
-          case "$VERSION" in *-*) prerelease_flag="--prerelease" ;; esac
-
-          gh release create "v${VERSION}" \
-            --target "$(git rev-parse HEAD)" \
-            --title "${VERSION}" \
-            --notes-file "${NOTES_FILE}" \
-            $prerelease_flag
+      contents: write        # create the tag + the GitHub Release
+      actions: read          # green-build gate reads CI conclusions
+      pull-requests: read    # release notes resolve each commit's PR author/number
+    uses: ekwi-tech/release-workflow/.github/workflows/composer-release-reusable.yml@b1357f2529fbe65f10cdd38cdcfd1a6db0648fdf # v0.1.0-beta.1
+    with:
+      channel: ${{ inputs.channel }}
+      # First release only (no tag yet). 2.2.0 keeps semver continuity with upstream olvlvl v2.1.2 + the
+      # CollectableAttribute feature, so a consumer's `^2.2` resolves cleanly.
+      initial-version: '2.2.0'
+      # Gate on the workflows that test OUR code. cases.yml is deliberately EXCLUDED: it installs pinned
+      # third-party fixtures (Symfony, Laravel) whose deps drift under external advisories, so it goes red for
+      # reasons unrelated to this package — gating on it would let an upstream advisory freeze our releases.
+      ci-workflows: 'test.yml quality.yml'
