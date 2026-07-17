@@ -106,6 +106,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # lifts the private-repo 403 on git-cliff's API enrichment
         with:
+          # Pin git-cliff: the action's default (2.5.0) leaves per-commit PR data (commit.remote.pr_number)
+          # unpopulated, so the "by @author in (#PR - commit)" line would lose its PR. 2.13.1 resolves it.
+          version: "2.13.1"
           config: cliff.toml
           args: --unreleased --tag v${{ steps.version.outputs.version }} --strip all
 

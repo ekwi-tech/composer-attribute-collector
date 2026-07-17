@@ -28,8 +28,8 @@ body = """
 
 {% for commit in commits %}\
 - {% if commit.breaking %}**BREAKING** {% endif %}{{ commit.message | upper_first }}\
-{% if commit.remote.username %} by @{{ commit.remote.username }}{% endif %} in \
-({% if commit.remote.pr_number %}#{{ commit.remote.pr_number }} - {% endif %}[`{{ commit.id | truncate(length=7, end="") }}`](https://github.com/ekwi-tech/composer-attribute-collector/commit/{{ commit.id }}))
+{% if commit.remote.username %} by @{{ commit.remote.username }}{% endif %} \
+{% if commit.remote.pr_number %}in (#{{ commit.remote.pr_number }} - {% else %}({% endif %}[`{{ commit.id | truncate(length=7, end="") }}`](https://github.com/ekwi-tech/composer-attribute-collector/commit/{{ commit.id }}))
 {% endfor %}
 {% endfor %}\
 {% if github %}\
@@ -75,6 +75,10 @@ split_commits = false
 # backticked token as-is.
 commit_preprocessors = [
   { pattern = '(^|[^`])@([A-Za-z0-9_-]+)', replace = '${1}`@${2}`' },
+  # Strip the trailing " (#N)" GitHub appends to a squash-merge subject — the body template re-renders the PR
+  # number in a controlled spot (`in (#N - ...)`). (?m) anchors to end-of-LINE: a preprocessor sees the raw
+  # full message (subject + body), where the subject's (#N) is not at end-of-string.
+  { pattern = '(?m) \(#[0-9]+\)$', replace = '' },
 ]
 commit_parsers = [
   { message = "^feat",     group = "Features"      },
