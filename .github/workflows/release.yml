@@ -33,8 +33,9 @@ jobs:
     name: Tag and publish the release
     runs-on: ubuntu-latest
     permissions:
-      contents: write   # create the git tag + GitHub Release
-      actions: read     # read CI runs for the green-build gate below
+      contents: write        # create the git tag + GitHub Release
+      actions: read          # read CI runs for the green-build gate below
+      pull-requests: read    # git-cliff resolves each commit's PR author/number for the release notes
 
     steps:
       - name: Refuse to release from a branch other than main
@@ -45,8 +46,9 @@ jobs:
           fi
 
       # fetch-depth: 0 gives the version policy and git-cliff every tag and the full commit graph — the
-      # next-version action refuses a shallow clone. persist-credentials: false keeps the GITHUB_TOKEN out
-      # of .git/config, where later third-party actions (git-cliff) could otherwise read it.
+      # next-version action refuses a shallow clone. persist-credentials: false keeps the GITHUB_TOKEN out of
+      # .git/config: git-cliff needs a token for its API enrichment, but gets it explicitly via the GITHUB_TOKEN
+      # env on its own step — not an ambient credential every later step could read from .git/config.
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           fetch-depth: 0
@@ -101,6 +103,8 @@ jobs:
       - name: Generate release notes with git-cliff
         id: notes
         uses: orhun/git-cliff-action@f50e11560dce63f7c33227798f90b924471a88b5 # v4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # lifts the private-repo 403 on git-cliff's API enrichment
         with:
           config: cliff.toml
           args: --unreleased --tag v${{ steps.version.outputs.version }} --strip all
@@ -120,6 +124,6 @@ jobs:
 
           gh release create "v${VERSION}" \
             --target "$(git rev-parse HEAD)" \
-            --title "composer-attribute-collector v${VERSION}" \
+            --title "${VERSION}" \
             --notes-file "${NOTES_FILE}" \
             $prerelease_flag

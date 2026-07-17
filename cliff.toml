@@ -27,24 +27,55 @@ body = """
 ### {{ group }}
 
 {% for commit in commits %}\
-- {% if commit.breaking %}**BREAKING** {% endif %}{{ commit.message | upper_first }} \
-([`{{ commit.id | truncate(length=7, end="") }}`](https://github.com/ekwi-tech/composer-attribute-collector/commit/{{ commit.id }}))
+- {% if commit.breaking %}**BREAKING** {% endif %}{{ commit.message | upper_first }}\
+{% if commit.remote.username %} by @{{ commit.remote.username }}{% endif %} in \
+({% if commit.remote.pr_number %}#{{ commit.remote.pr_number }} - {% endif %}[`{{ commit.id | truncate(length=7, end="") }}`](https://github.com/ekwi-tech/composer-attribute-collector/commit/{{ commit.id }}))
 {% endfor %}
-{% endfor %}
+{% endfor %}\
+{% if github %}\
+{% set first_timers = github.contributors | filter(attribute="is_first_time", value=true) %}\
+{% if first_timers | length > 0 %}
+### New Contributors
+
+{% for c in first_timers %}\
+- @{{ c.username }} made their first contribution{% if c.pr_number %} in #{{ c.pr_number }}{% endif %}
+{% endfor %}\
+{% endif %}\
+{% endif %}
 """
 trim = true
 footer = ""
 
-# No [remote.github] section on purpose: it makes git-cliff call the GitHub API to enrich notes with
-# PR/contributor data, and on a PRIVATE repo that call returns 403 without a token and git-cliff panics.
-# The changelog body uses only commit id/message with a hard-coded commit URL, so remote enrichment brings
-# nothing. To add PR links later: re-add [remote.github] AND pass GITHUB_TOKEN to the git-cliff step.
+# Remote enrichment: git-cliff hits the GitHub API for each commit's PR author/number and the "New
+# Contributors" list. Reverses the earlier removal of [remote.github] — which existed only because the call
+# 403s (git-cliff panics) on a PRIVATE repo without a token; the workflow now passes GITHUB_TOKEN, lifting it.
+# Trade-off: a release now depends on the GitHub API at cut time (5000 req/h with the token — not a real
+# limit). Token via the GITHUB_TOKEN env, never hard-coded here.
+#
+# API asymmetry, not a typo: per-commit fields are `commit.remote.*` (forge-agnostic), the release-level
+# contributor list is `github.contributors` (GitHub-specific).
+[remote.github]
+owner = "ekwi-tech"
+repo = "composer-attribute-collector"
 
 [git]
 conventional_commits = true
 filter_unconventional = true
 split_commits = false
-commit_preprocessors = []
+# Neutralise free-text @-mentions leaking from a commit subject: an annotation like `@readonly` is not a
+# person, but GitHub linkifies it into a phantom "Contributor". A code span suppresses that — GitHub never
+# resolves mentions inside code spans.
+#
+# Message-scoped (a preprocessor), not changelog-wide (a postprocessor): the free-text message is the only
+# untrusted source of an `@token`. The real PR author is injected by the template from `commit.remote.username`
+# — outside the message — so it stays a genuine mention; a global pass would have wrapped it too.
+#
+# Runs before Conventional-Commit parsing but touches only @tokens, so the `fix:`/`feat:` prefix — hence
+# grouping and version derivation — is untouched. Idempotent: the leading-char guard leaves an already
+# backticked token as-is.
+commit_preprocessors = [
+  { pattern = '(^|[^`])@([A-Za-z0-9_-]+)', replace = '${1}`@${2}`' },
+]
 commit_parsers = [
   { message = "^feat",     group = "Features"      },
   { message = "^fix",      group = "Bug Fixes"      },
