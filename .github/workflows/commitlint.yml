@@ -14,4 +14,4 @@ jobs:
     # check: "Conventional Commit PR Title / title / Enforce Conventional Commits format on PR title".
     permissions:
       pull-requests: read
-    uses: ekwi-tech/release-workflow/.github/workflows/commitlint-reusable.yml@3c52d05c043313baaa25fbd668c4353562e521e4 # v0.1.0
+    uses: ekwi-tech/release-workflow/.github/workflows/commitlint-reusable.yml@a0eb3f966bc937bde758e746df16996254b4d7b6 # v0.1.0
