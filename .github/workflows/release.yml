@@ -27,7 +27,7 @@ jobs:
       contents: write        # create the tag + the GitHub Release
       actions: read          # green-build gate reads CI conclusions
       pull-requests: read    # release notes resolve each commit's PR author/number
-    uses: ekwi-tech/release-workflow/.github/workflows/composer-release-reusable.yml@a0eb3f966bc937bde758e746df16996254b4d7b6 # v0.1.0
+    uses: ekwi-tech/release-workflow/.github/workflows/composer-release-reusable.yml@3a747dc7143a2179cedec8f606cf2c9ec7b55d12 # v0.1.0
     with:
       channel: ${{ inputs.channel }}
       # First release only (no tag yet). 2.2.0 keeps semver continuity with upstream olvlvl v2.1.2 + the
