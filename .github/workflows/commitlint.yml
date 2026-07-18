@@ -1,35 +1,17 @@
-name: _Ekwi — Semantic PR Title
+name: Conventional Commit PR Title
 
-# The release notes (release-notes-action) and the derived version (next-version-action) read Conventional Commits.
-# This check enforces a Conventional Commit PR title so every merged change is classifiable: keep the
-# individual commits conventional too, or squash to the title. (The upstream-sync PR title
-# `chore: sync upstream (...)` is conventional all the same.)
+# Enforces a Conventional-Commit PR title by calling the fleet's shared reusable — the action pin and the ten-type
+# vocabulary live once in release-workflow, adopted here by bumping the pinned SHA (Dependabot tracks it).
 on:
   pull_request:
     types: [opened, edited, synchronize, reopened]
 
-permissions:
-  pull-requests: read
+permissions: {}
 
 jobs:
-  validate-pr-title:
-    name: Enforce Conventional Commits format on PR title
-    runs-on: ubuntu-latest
-    steps:
-      - uses: amannn/action-semantic-pull-request@48f256284bd46cdaab1048c3721360e808335d50 # v6.1.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          # Allowed commit types — mirrors the commit_parsers in release-notes-action's cliff.toml.
-          types: |
-            feat
-            fix
-            perf
-            refactor
-            build
-            chore
-            ci
-            docs
-            style
-            test
-          requireScope: false
+  title:
+    # The caller grants the token scope; the reusable reads the PR title via the automatic GITHUB_TOKEN. Resulting
+    # check: "Conventional Commit PR Title / title / Enforce Conventional Commits format on PR title".
+    permissions:
+      pull-requests: read
+    uses: ekwi-tech/release-workflow/.github/workflows/commitlint-reusable.yml@3c52d05c043313baaa25fbd668c4353562e521e4 # v0.1.0
