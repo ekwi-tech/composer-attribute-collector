@@ -1,4 +1,4 @@
-name: Semantic Checks
+name: _Ekwi — Semantic Checks
 
 # Enforces a Conventional-Commit PR title by calling the fleet's shared reusable — the action pin and the ten-type
 # vocabulary live once in release-workflow, adopted here by bumping the pinned SHA (Dependabot tracks it).
@@ -12,7 +12,7 @@ jobs:
   title:
     name: PR title
     # The caller grants the token scope; the reusable reads the PR title via the automatic GITHUB_TOKEN. Resulting
-    # check: "Semantic Checks / PR title / Conventional Commits on PR Title".
+    # check: "_Ekwi — Semantic Checks / PR title / Conventional Commits on PR Title".
     permissions:
       pull-requests: read
     uses: ekwi-tech/release-workflow/.github/workflows/commitlint-reusable.yml@3a747dc7143a2179cedec8f606cf2c9ec7b55d12 # v0.1.0
