@@ -56,7 +56,6 @@ class ClassAttributeCollector
 
             $classAttributes[] = new TransientTargetClass(
                 $attribute->getName(),
-                $attribute->getArguments(),
             );
         }
 
@@ -89,7 +88,6 @@ class ClassAttributeCollector
 
                 $propertyAttributes[] = new TransientTargetProperty(
                     $attribute->getName(),
-                    $attribute->getArguments(),
                     $property,
                 );
             }
@@ -167,7 +165,6 @@ class ClassAttributeCollector
 
             $methodAttributes[] = new TransientTargetMethod(
                 $attribute->getName(),
-                $attribute->getArguments(),
                 $method,
             );
         }
@@ -202,7 +199,6 @@ class ClassAttributeCollector
 
                 $targets[] = new TransientTargetParameter(
                     $attribute->getName(),
-                    $attribute->getArguments(),
                     $method,
                     $name
                 );
