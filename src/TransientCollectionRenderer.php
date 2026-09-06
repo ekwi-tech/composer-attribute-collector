@@ -2,15 +2,24 @@
 
 namespace olvlvl\ComposerAttributeCollector;
 
+use function array_map;
+use function implode;
+use function is_array;
 use function var_export;
 
 /**
  * Renders collected attribute targets as PHP code.
  *
+ * Only the names of the attributes and their targets are rendered. Attribute arguments are
+ * deliberately left out: they can hold arbitrary values—objects, in particular—that cannot be
+ * exported as PHP code.
+ *
  * @internal
  */
 final class TransientCollectionRenderer
 {
+    private const INDENT = '    ';
+
     public static function render(TransientCollection $collector): string
     {
         $targetClassesCode = self::targetsToCode($collector->classes);
@@ -43,7 +52,43 @@ final class TransientCollectionRenderer
     {
         $array = self::targetsToArray($targetByClass);
 
-        return var_export($array, true);
+        if (!$array) {
+            return '[]';
+        }
+
+        $indent = self::INDENT;
+        $code = "[\n";
+
+        foreach ($array as $attribute => $targets) {
+            $code .= "$indent$indent" . self::exportString($attribute) . " => [\n";
+
+            foreach ($targets as $target) {
+                $code .= "$indent$indent$indent" . self::exportTarget($target) . ",\n";
+            }
+
+            $code .= "$indent$indent],\n";
+        }
+
+        return $code . "$indent]";
+    }
+
+    /**
+     * @param string|array<string> $target
+     */
+    private static function exportTarget(string|array $target): string
+    {
+        if (is_array($target)) {
+            $exported = array_map(fn(string $v): string => self::exportString($v), $target);
+
+            return '[ ' . implode(', ', $exported) . ' ]';
+        }
+
+        return self::exportString($target);
+    }
+
+    private static function exportString(string $value): string
+    {
+        return var_export($value, true);
     }
 
     /**
@@ -51,11 +96,10 @@ final class TransientCollectionRenderer
      *
      * @param iterable<class-string, iterable<TransientTargetClass|TransientTargetMethod|TransientTargetParameter|TransientTargetProperty>> $targetByClass
      *
-     * @return array<class-string, array<array{
-     *     array<int|string, mixed>,
+     * @return array<class-string, array<class-string|array{
      *     class-string,
-     *     2?:non-empty-string,
-     *     3?:non-empty-string
+     *     non-empty-string,
+     *     2?:non-empty-string
      * }>>
      */
     private static function targetsToArray(iterable $targetByClass): array
@@ -64,19 +108,19 @@ final class TransientCollectionRenderer
 
         foreach ($targetByClass as $class => $targets) {
             foreach ($targets as $t) {
-                $a = [ $t->arguments, $class ];
+                if ($t instanceof TransientTargetClass) {
+                    $by[$t->attribute][] = $class;
+
+                    continue;
+                }
+
+                $a = [ $class ];
 
                 if ($t instanceof TransientTargetParameter) {
                     $a[] = $t->method;
                 }
 
-                if (
-                    $t instanceof TransientTargetMethod
-                    || $t instanceof TransientTargetProperty
-                    || $t instanceof TransientTargetParameter
-                ) {
-                    $a[] = $t->name;
-                }
+                $a[] = $t->name;
 
                 $by[$t->attribute][] = $a;
             }

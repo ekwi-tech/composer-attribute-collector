@@ -10,12 +10,13 @@ namespace olvlvl\ComposerAttributeCollector;
 final class TargetClass
 {
     /**
-     * @param T $attribute
+     * @param class-string<T> $attribute
+     *     The name of the attribute class.
      * @param class-string $name
      *     The name of the target class.
      */
     public function __construct(
-        public object $attribute,
+        public string $attribute,
         public string $name,
     ) {
     }

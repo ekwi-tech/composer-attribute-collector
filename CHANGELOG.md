@@ -1,5 +1,36 @@
 # CHANGELOG
 
+## Unreleased
+
+### New Requirements
+
+None
+
+### New features
+
+None
+
+### Deprecated Features
+
+None
+
+### Backward Incompatible Changes
+
+Attribute arguments are no longer collected. The generated "attributes" file now only records the
+names of the attributes and of their targets, because arguments can hold arbitrary values—objects,
+in particular—that cannot be rendered as PHP code and break the generated file unless they
+implement `__set_state()`.
+
+As a consequence, the `attribute` property of `TargetClass`, `TargetMethod`, `TargetProperty`, and
+`TargetParameter` is now the **name** of the attribute class instead of an instance of it, and
+`ForClass` exposes attribute names instead of instances. Use reflection on the discovered target if
+you need the arguments of an attribute.
+
+### Other Changes
+
+None
+
+
 ## v2.1.2
 
 ### New Requirements

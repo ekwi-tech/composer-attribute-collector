@@ -10,7 +10,8 @@ namespace olvlvl\ComposerAttributeCollector;
 final class TargetParameter
 {
     /**
-     * @param T $attribute
+     * @param class-string<T> $attribute
+     *     The name of the attribute class.
      * @param class-string $class
      *     The name of the target class.
      * @param non-empty-string $method
@@ -19,7 +20,7 @@ final class TargetParameter
      *     The name of the target parameter.
      */
     public function __construct(
-        public object $attribute,
+        public string $attribute,
         public string $class,
         public string $method,
         public string $name,
