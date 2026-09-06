@@ -105,7 +105,7 @@ abstract class CollectorTestAbstract extends TestCase
      * @dataProvider provideTargetClasses
      *
      * @param class-string $attribute
-     * @param array<array{ object, class-string }> $expected
+     * @param array<array{ class-string, class-string }> $expected
      */
     public function testTargetClasses(string $attribute, array $expected): void
     {
@@ -115,7 +115,7 @@ abstract class CollectorTestAbstract extends TestCase
     }
 
     /**
-     * @return array<array{ class-string, array<array{ object, class-string }> }>
+     * @return array<array{ class-string, array<array{ class-string, class-string }> }>
      */
     public static function provideTargetClasses(): array
     {
@@ -124,30 +124,30 @@ abstract class CollectorTestAbstract extends TestCase
             [
                 Permission::class,
                 [
-                    [ new Permission('is_admin'), \Acme\PSR4\CreateMenu::class ],
-                    [ new Permission('can_create_menu'), \Acme\PSR4\CreateMenu::class ],
-                    [ new Permission('is_admin'), \Acme\PSR4\DeleteMenu::class ],
-                    [ new Permission('can_delete_menu'), \Acme\PSR4\DeleteMenu::class ],
+                    [ Permission::class, \Acme\PSR4\CreateMenu::class ],
+                    [ Permission::class, \Acme\PSR4\CreateMenu::class ],
+                    [ Permission::class, \Acme\PSR4\DeleteMenu::class ],
+                    [ Permission::class, \Acme\PSR4\DeleteMenu::class ],
                 ],
             ],
             [
                 Handler::class,
                 [
-                    [ new Handler(), \Acme\PSR4\CreateMenuHandler::class ],
-                    [ new Handler(), \Acme\PSR4\DeleteMenuHandler::class ],
+                    [ Handler::class, \Acme\PSR4\CreateMenuHandler::class ],
+                    [ Handler::class, \Acme\PSR4\DeleteMenuHandler::class ],
                 ],
             ],
             [
                 Index::class,
                 [
-                    [ new Index('active'), \Acme\PSR4\ActiveRecord\Article::class ],
+                    [ Index::class, \Acme\PSR4\ActiveRecord\Article::class ],
                 ],
             ],
             [
                 AutowiredService::class,
                 [
                     [
-                        new AutowiredService(factory: '@Acme\PSR4\SignatureMap\SignatureMapProviderFactory::create'),
+                        AutowiredService::class,
                         \Acme\PSR4\SignatureMapProvider::class,
                     ],
                 ],
@@ -160,7 +160,7 @@ abstract class CollectorTestAbstract extends TestCase
      * @dataProvider provideTargetMethods
      *
      * @param class-string $attribute
-     * @param array<array{ object, callable-string }> $expected
+     * @param array<array{ class-string, callable-string }> $expected
      */
     public function testTargetMethods(string $attribute, array $expected): void
     {
@@ -170,7 +170,7 @@ abstract class CollectorTestAbstract extends TestCase
     }
 
     /**
-     * @return array<array{ class-string, array<array{ object, callable-string }> }>
+     * @return array<array{ class-string, array<array{ class-string, callable-string }> }>
      */
     public static function provideTargetMethods(): array
     {
@@ -180,15 +180,15 @@ abstract class CollectorTestAbstract extends TestCase
                 Route::class,
                 [
                     [
-                        new Route("/articles/method/", 'GET', 'articles:method'),
+                        Route::class,
                         'Acme\PSR4\Presentation\ArticleController::aMethod',
                     ],
                     [
-                        new Route("/articles", 'GET', 'articles:list'),
+                        Route::class,
                         'Acme\PSR4\Presentation\ArticleController::list',
                     ],
                     [
-                        new Route("/articles/{id}", 'GET', 'articles:show'),
+                        Route::class,
                         'Acme\PSR4\Presentation\ArticleController::show',
                     ],
                 ],
@@ -196,24 +196,24 @@ abstract class CollectorTestAbstract extends TestCase
             [
                 Get::class,
                 [
-                    [ new Get(), 'Acme\Presentation\FileController::list' ],
-                    [ new Get('/{id}'), 'Acme\Presentation\FileController::show' ],
-                    [ new Get(), 'Acme\Presentation\ImageController::list' ],
-                    [ new Get('/{id}'), 'Acme\Presentation\ImageController::show' ],
+                    [ Get::class, 'Acme\Presentation\FileController::list' ],
+                    [ Get::class, 'Acme\Presentation\FileController::show' ],
+                    [ Get::class, 'Acme\Presentation\ImageController::list' ],
+                    [ Get::class, 'Acme\Presentation\ImageController::show' ],
                 ],
             ],
             [
                 Subscribe::class,
                 [
-                    [ new Subscribe(), 'Acme\PSR4\SubscriberA::onEventA' ],
-                    [ new Subscribe(), 'Acme\PSR4\SubscriberB::onEventA' ],
+                    [ Subscribe::class, 'Acme\PSR4\SubscriberA::onEventA' ],
+                    [ Subscribe::class, 'Acme\PSR4\SubscriberB::onEventA' ],
                 ],
             ],
             [
                 UrlGetter::class,
                 [
-                    [ new UrlGetter(), 'Acme\PSR4\InheritedAttributeSample::get_url' ],
-                    [ new UrlGetter(), 'Acme\PSR4\Routing\UrlTrait::get_url' ],
+                    [ UrlGetter::class, 'Acme\PSR4\InheritedAttributeSample::get_url' ],
+                    [ UrlGetter::class, 'Acme\PSR4\Routing\UrlTrait::get_url' ],
                 ],
             ],
 
@@ -224,7 +224,7 @@ abstract class CollectorTestAbstract extends TestCase
      * @dataProvider provideTargetParameters
      *
      * @param class-string $attribute
-     * @param array<array{ object, callable-string }> $expected
+     * @param array<array{ class-string, callable-string }> $expected
      */
     public function testTargetParameters(string $attribute, array $expected): void
     {
@@ -234,7 +234,7 @@ abstract class CollectorTestAbstract extends TestCase
     }
 
     /**
-     * @return array<array{ class-string, array<array{ object, callable-string }> }>
+     * @return array<array{ class-string, array<array{ class-string, callable-string }> }>
      */
     public static function provideTargetParameters(): array
     {
@@ -244,11 +244,11 @@ abstract class CollectorTestAbstract extends TestCase
                 ParameterA::class,
                 [
                     [
-                        new ParameterA('my parameter label'),
+                        ParameterA::class,
                         'Acme\PSR4\Presentation\ArticleController::aMethod(myParameter)',
                     ],
                     [
-                        new ParameterA('my yet another parameter label'),
+                        ParameterA::class,
                         'Acme\PSR4\Presentation\ArticleController::aMethod(yetAnotherParameter)',
                     ],
                 ],
@@ -257,7 +257,7 @@ abstract class CollectorTestAbstract extends TestCase
                 ParameterB::class,
                 [
                     [
-                        new ParameterB('my 2nd parameter label', 'some more data'),
+                        ParameterB::class,
                         'Acme\PSR4\Presentation\ArticleController::aMethod(anotherParameter)',
                     ],
                 ],
@@ -270,7 +270,7 @@ abstract class CollectorTestAbstract extends TestCase
      * @dataProvider provideTargetProperties
      *
      * @param class-string $attribute
-     * @param array<array{ object, string }> $expected
+     * @param array<array{ class-string, string }> $expected
      */
     public function testTargetProperties(string $attribute, array $expected): void
     {
@@ -280,7 +280,7 @@ abstract class CollectorTestAbstract extends TestCase
     }
 
     /**
-     * @return array<array{ class-string, array<array{ object, string }> }>
+     * @return array<array{ class-string, array<array{ class-string, string }> }>
      */
     public static function provideTargetProperties(): array
     {
@@ -289,22 +289,22 @@ abstract class CollectorTestAbstract extends TestCase
             [
                 Serial::class,
                 [
-                    [ new Serial(), 'Acme\PSR4\ActiveRecord\Article::id' ],
+                    [ Serial::class, 'Acme\PSR4\ActiveRecord\Article::id' ],
                 ],
             ],
 
             [
                 Varchar::class,
                 [
-                    [ new Varchar(80, unique: true), 'Acme\PSR4\ActiveRecord\Article::slug' ],
-                    [ new Varchar(80), 'Acme\PSR4\ActiveRecord\Article::title' ],
+                    [ Varchar::class, 'Acme\PSR4\ActiveRecord\Article::slug' ],
+                    [ Varchar::class, 'Acme\PSR4\ActiveRecord\Article::title' ],
                 ],
             ],
 
             [
                 Text::class,
                 [
-                    [ new Text(), 'Acme\PSR4\ActiveRecord\Article::body' ],
+                    [ Text::class, 'Acme\PSR4\ActiveRecord\Article::body' ],
                 ],
             ],
 
@@ -318,12 +318,12 @@ abstract class CollectorTestAbstract extends TestCase
         );
 
         $this->assertEquals([
-            [ new Permission('is_admin'), \Acme\PSR4\CreateMenu::class ],
-            [ new Permission('can_create_menu'), \Acme\PSR4\CreateMenu::class ],
-            [ new Handler(), \Acme\PSR4\CreateMenuHandler::class ],
-            [ new Permission('is_admin'), \Acme\PSR4\DeleteMenu::class ],
-            [ new Permission('can_delete_menu'), \Acme\PSR4\DeleteMenu::class ],
-            [ new Handler(), \Acme\PSR4\DeleteMenuHandler::class ],
+            [ Permission::class, \Acme\PSR4\CreateMenu::class ],
+            [ Permission::class, \Acme\PSR4\CreateMenu::class ],
+            [ Handler::class, \Acme\PSR4\CreateMenuHandler::class ],
+            [ Permission::class, \Acme\PSR4\DeleteMenu::class ],
+            [ Permission::class, \Acme\PSR4\DeleteMenu::class ],
+            [ Handler::class, \Acme\PSR4\DeleteMenuHandler::class ],
         ], $this->collectClasses($actual));
     }
 
@@ -335,15 +335,15 @@ abstract class CollectorTestAbstract extends TestCase
 
         $this->assertEquals([
             [
-                new Route("/articles/method/", 'GET', 'articles:method'),
+                Route::class,
                 'Acme\PSR4\Presentation\ArticleController::aMethod',
             ],
-            [ new Route("/articles", 'GET', 'articles:list'), 'Acme\PSR4\Presentation\ArticleController::list' ],
-            [ new Route("/articles/{id}", 'GET', 'articles:show'), 'Acme\PSR4\Presentation\ArticleController::show' ],
-            [ new Get(), 'Acme\Presentation\FileController::list' ],
-            [ new Get('/{id}'), 'Acme\Presentation\FileController::show' ],
-            [ new Get(), 'Acme\Presentation\ImageController::list' ],
-            [ new Get('/{id}'), 'Acme\Presentation\ImageController::show' ],
+            [ Route::class, 'Acme\PSR4\Presentation\ArticleController::list' ],
+            [ Route::class, 'Acme\PSR4\Presentation\ArticleController::show' ],
+            [ Get::class, 'Acme\Presentation\FileController::list' ],
+            [ Get::class, 'Acme\Presentation\FileController::show' ],
+            [ Get::class, 'Acme\Presentation\ImageController::list' ],
+            [ Get::class, 'Acme\Presentation\ImageController::show' ],
         ], $this->collectMethods($actual));
     }
 
@@ -354,17 +354,17 @@ abstract class CollectorTestAbstract extends TestCase
     {
         $expected = [
             new TargetMethod(
-                new \Acme81\Attribute\Route('/:id', method: \Acme81\Attribute\Method::GET),
+                \Acme81\Attribute\Route::class,
                 \Acme81\PSR4\Presentation\ArticleController::class,
                 'show',
             ),
             new TargetMethod(
-                new \Acme81\Attribute\Get(),
+                \Acme81\Attribute\Get::class,
                 \Acme81\PSR4\Presentation\ArticleController::class,
                 'list',
             ),
             new TargetMethod(
-                new \Acme81\Attribute\Post(),
+                \Acme81\Attribute\Post::class,
                 \Acme81\PSR4\Presentation\ArticleController::class,
                 'new',
             ),
@@ -384,9 +384,9 @@ abstract class CollectorTestAbstract extends TestCase
         );
 
         $this->assertEquals([
-            [ new ParameterA("my parameter label"), 'Acme\PSR4\Presentation\ArticleController::aMethod(myParameter)' ],
+            [ ParameterA::class, 'Acme\PSR4\Presentation\ArticleController::aMethod(myParameter)' ],
             [
-                new ParameterA('my yet another parameter label'),
+                ParameterA::class,
                 'Acme\PSR4\Presentation\ArticleController::aMethod(yetAnotherParameter)',
             ],
         ], $this->collectParameters($actual));
@@ -399,12 +399,12 @@ abstract class CollectorTestAbstract extends TestCase
         );
 
         $this->assertEquals([
-            [ new Boolean(), 'Acme\PSR4\ActiveRecord\Article::active' ],
-            [ new Text(), 'Acme\PSR4\ActiveRecord\Article::body' ],
-            [ new Id(), 'Acme\PSR4\ActiveRecord\Article::id' ],
-            [ new Serial(), 'Acme\PSR4\ActiveRecord\Article::id' ],
-            [ new Varchar(80, unique: true), 'Acme\PSR4\ActiveRecord\Article::slug' ],
-            [ new Varchar(80), 'Acme\PSR4\ActiveRecord\Article::title' ],
+            [ Boolean::class, 'Acme\PSR4\ActiveRecord\Article::active' ],
+            [ Text::class, 'Acme\PSR4\ActiveRecord\Article::body' ],
+            [ Id::class, 'Acme\PSR4\ActiveRecord\Article::id' ],
+            [ Serial::class, 'Acme\PSR4\ActiveRecord\Article::id' ],
+            [ Varchar::class, 'Acme\PSR4\ActiveRecord\Article::slug' ],
+            [ Varchar::class, 'Acme\PSR4\ActiveRecord\Article::title' ],
         ], $this->collectProperties($actual));
     }
 
@@ -413,13 +413,13 @@ abstract class CollectorTestAbstract extends TestCase
         $forClass = Attributes::forClass(ArticleController::class);
 
         $this->assertEquals([
-            new Resource('articles'),
+            Resource::class,
         ], $forClass->classAttributes);
 
         $this->assertEquals([
-            'list' => [ new Route("/articles", 'GET', 'articles:list') ],
-            'show' => [ new Route("/articles/{id}", 'GET', 'articles:show') ],
-            'aMethod' => [ new Route("/articles/method/", 'GET', 'articles:method') ],
+            'list' => [ Route::class ],
+            'show' => [ Route::class ],
+            'aMethod' => [ Route::class ],
         ], $forClass->methodsAttributes);
     }
 
@@ -428,7 +428,7 @@ abstract class CollectorTestAbstract extends TestCase
      *
      * @param array<TargetClass<T>> $targets
      *
-     * @return array<array{T, class-string}>
+     * @return array<array{class-string<T>, class-string}>
      */
     private function collectClasses(array $targets): array
     {
@@ -448,7 +448,7 @@ abstract class CollectorTestAbstract extends TestCase
      *
      * @param array<TargetMethod<T>> $targets
      *
-     * @return array<array{T, string}>
+     * @return array<array{class-string<T>, string}>
      */
     private function collectMethods(array $targets): array
     {
@@ -468,7 +468,7 @@ abstract class CollectorTestAbstract extends TestCase
      *
      * @param TargetParameter<T>[] $targets
      *
-     * @return array<array{T, string}>
+     * @return array<array{class-string<T>, string}>
      */
     private function collectParameters(array $targets): array
     {
@@ -488,7 +488,7 @@ abstract class CollectorTestAbstract extends TestCase
      *
      * @param TargetProperty<T>[] $targets
      *
-     * @return array<array{T, string}>
+     * @return array<array{class-string<T>, string}>
      */
     private function collectProperties(array $targets): array
     {

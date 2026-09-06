@@ -19,6 +19,7 @@ analysis. (For known targets, traditional reflection remains an option.)
 - Might improve performance
 - No dependency (except Composer of course)
 - A single interface to get attribute targets: classes, methods, and properties
+- Only names are collected, so no attribute argument can break the generated file
 - Can cache discoveries to speed up consecutive runs.
 
 > [!NOTE]
@@ -47,8 +48,8 @@ require_once 'vendor/attributes.php'; // <-- the file created by the plugin
 
 // Find the target classes of the AsMessageHandler attribute.
 foreach (Attributes::findTargetClasses(AsMessageHandler::class) as $target) {
-    // $target->attribute is an instance of the specified attribute
-    // with the actual data.
+    // $target->attribute is the name of the attribute class,
+    // $target->name the name of the target class.
     var_dump($target->attribute, $target->name);
 }
 
@@ -77,13 +78,30 @@ foreach (Attributes::filterTargetMethods($predicate) as $target) {
     var_dump($target->attribute, $target->class, $target->name);
 }
 
-// Find class, method, and property attributes for the ArticleController class.
+// Find class, method, and property attribute names for the ArticleController class.
 $attributes = Attributes::forClass(ArticleController::class);
 
 var_dump($attributes->classAttributes);
 var_dump($attributes->methodsAttributes);
 var_dump($attributes->propertyAttributes);
 ```
+
+> [!IMPORTANT]
+> The plugin collects **names**, not attribute instances: it records which classes, methods,
+> properties, and parameters an attribute is used on, and nothing else. Attribute _arguments_ are
+> not collected, because they can hold arbitrary values—objects in particular—that cannot be
+> rendered as PHP code in the generated file. If you need the arguments of an attribute, use
+> reflection on the target you discovered:
+>
+> ```php
+> foreach (Attributes::findTargetClasses(AsMessageHandler::class) as $target) {
+>     $reflection = new ReflectionClass($target->name);
+>
+>     foreach ($reflection->getAttributes($target->attribute) as $attribute) {
+>         $instance = $attribute->newInstance();
+>     }
+> }
+> ```
 
 
 

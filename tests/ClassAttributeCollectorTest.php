@@ -61,8 +61,8 @@ final class ClassAttributeCollectorTest extends TestCase
                 CreateMenu::class,
                 [
                     [
-                        new TransientTargetClass('Acme\Attribute\Permission', [ 'is_admin' ]),
-                        new TransientTargetClass('Acme\Attribute\Permission', [ 'can_create_menu' ]),
+                        new TransientTargetClass('Acme\Attribute\Permission'),
+                        new TransientTargetClass('Acme\Attribute\Permission'),
                     ],
                     [],
                     [],
@@ -74,7 +74,7 @@ final class ClassAttributeCollectorTest extends TestCase
                 CreateMenuHandler::class,
                 [
                     [
-                        new TransientTargetClass('Acme\Attribute\Handler', []),
+                        new TransientTargetClass('Acme\Attribute\Handler'),
                     ],
                     [],
                     [],
@@ -86,44 +86,21 @@ final class ClassAttributeCollectorTest extends TestCase
                 ArticleController::class,
                 [
                     [
-                        new TransientTargetClass('Acme\Attribute\Resource', [ "articles" ]),
+                        new TransientTargetClass('Acme\Attribute\Resource'),
                     ],
                     [
-                        new TransientTargetMethod(
-                            'Acme\Attribute\Route',
-                            [ 'method' => 'GET', 'id' => 'articles:list', 'pattern' => "/articles" ],
-                            'list',
-                        ),
-                        new TransientTargetMethod(
-                            'Acme\Attribute\Route',
-                            [ 'id' => 'articles:show', 'pattern' => "/articles/{id}", 'method' => 'GET' ],
-                            'show',
-                        ),
-                        new TransientTargetMethod(
-                            'Acme\Attribute\Route',
-                            [ "/articles/method/", 'GET', 'articles:method' ],
-                            'aMethod',
-                        ),
+                        new TransientTargetMethod('Acme\Attribute\Route', 'list'),
+                        new TransientTargetMethod('Acme\Attribute\Route', 'show'),
+                        new TransientTargetMethod('Acme\Attribute\Route', 'aMethod'),
                     ],
                     [],
                     [
+                        new TransientTargetParameter('Acme81\Attribute\ParameterA', 'aMethod', 'myParameter'),
+                        new TransientTargetParameter('Acme81\Attribute\ParameterB', 'aMethod', 'anotherParameter'),
                         new TransientTargetParameter(
                             'Acme81\Attribute\ParameterA',
-                            ["my parameter label"],
                             'aMethod',
-                            'myParameter'
-                        ),
-                        new TransientTargetParameter(
-                            'Acme81\Attribute\ParameterB',
-                            ["my 2nd parameter label", "some more data"],
-                            'aMethod',
-                            'anotherParameter'
-                        ),
-                        new TransientTargetParameter(
-                            'Acme81\Attribute\ParameterA',
-                            ["my yet another parameter label"],
-                            'aMethod',
-                            'yetAnotherParameter'
+                            'yetAnotherParameter',
                         ),
                     ],
                 ]
@@ -134,7 +111,7 @@ final class ClassAttributeCollectorTest extends TestCase
                 [
                     [],
                     [
-                        new TransientTargetMethod('Acme\Attribute\Subscribe', [], 'onEventA'),
+                        new TransientTargetMethod('Acme\Attribute\Subscribe', 'onEventA'),
                     ],
                     [],
                     [],
@@ -145,17 +122,17 @@ final class ClassAttributeCollectorTest extends TestCase
                 Article::class,
                 [
                     [
-                        new TransientTargetClass('Acme\Attribute\ActiveRecord\Index', [ 'active' ]),
+                        new TransientTargetClass('Acme\Attribute\ActiveRecord\Index'),
                     ],
                     [
                     ],
                     [
-                        new TransientTargetProperty('Acme\Attribute\ActiveRecord\Id', [], 'id'),
-                        new TransientTargetProperty('Acme\Attribute\ActiveRecord\Serial', [], 'id'),
-                        new TransientTargetProperty('Acme\Attribute\ActiveRecord\Varchar', [ 80 ], 'title'),
-                        new TransientTargetProperty('Acme\Attribute\ActiveRecord\Varchar', [ 80, 'unique' => true ], 'slug'),
-                        new TransientTargetProperty('Acme\Attribute\ActiveRecord\Text', [], 'body'),
-                        new TransientTargetProperty('Acme\Attribute\ActiveRecord\Boolean', [], 'active'),
+                        new TransientTargetProperty('Acme\Attribute\ActiveRecord\Id', 'id'),
+                        new TransientTargetProperty('Acme\Attribute\ActiveRecord\Serial', 'id'),
+                        new TransientTargetProperty('Acme\Attribute\ActiveRecord\Varchar', 'title'),
+                        new TransientTargetProperty('Acme\Attribute\ActiveRecord\Varchar', 'slug'),
+                        new TransientTargetProperty('Acme\Attribute\ActiveRecord\Text', 'body'),
+                        new TransientTargetProperty('Acme\Attribute\ActiveRecord\Boolean', 'active'),
                     ],
                     [],
                 ]
