@@ -178,19 +178,19 @@ final class Collection
         $classAttributes = [];
 
         foreach ($this->filterTargetClasses(fn($a, $c): bool => $c === $class) as $targetClass) {
-            $classAttributes[] = $targetClass->attribute;
+            $classAttributes[] = $targetClass->getAttributeClass();
         }
 
         $methodAttributes = [];
 
         foreach ($this->filterTargetMethods(fn($a, $c): bool => $c === $class) as $targetMethod) {
-            $methodAttributes[$targetMethod->name][] = $targetMethod->attribute;
+            $methodAttributes[$targetMethod->getName()][] = $targetMethod->getAttributeClass();
         }
 
         $propertyAttributes = [];
 
         foreach ($this->filterTargetProperties(fn($a, $c): bool => $c === $class) as $targetProperty) {
-            $propertyAttributes[$targetProperty->name][] = $targetProperty->attribute;
+            $propertyAttributes[$targetProperty->getName()][] = $targetProperty->getAttributeClass();
         }
 
         return new ForClass(

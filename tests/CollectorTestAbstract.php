@@ -408,6 +408,73 @@ abstract class CollectorTestAbstract extends TestCase
         ], $this->collectProperties($actual));
     }
 
+    public function testGetAttributeInstantiatesTheAttributeOfATargetClass(): void
+    {
+        $targets = Attributes::findTargetClasses(Resource::class);
+
+        $this->assertCount(1, $targets);
+        $this->assertSame('articles', $targets[0]->getAttribute()->name);
+    }
+
+    public function testGetAttributeInstantiatesTheAttributeOfATargetMethod(): void
+    {
+        $targets = Attributes::findTargetMethods(Route::class);
+        $attributes = [];
+
+        foreach ($targets as $target) {
+            $attributes[$target->getName()] = $target->getAttribute()->id;
+        }
+
+        $this->assertEquals([
+            'list' => 'articles:list',
+            'show' => 'articles:show',
+            'aMethod' => 'articles:method',
+        ], $attributes);
+    }
+
+    public function testGetAttributeInstantiatesTheAttributeOfATargetProperty(): void
+    {
+        $targets = Attributes::findTargetProperties(Varchar::class);
+        $attributes = [];
+
+        foreach ($targets as $target) {
+            $attributes[$target->getName()] = $target->getAttribute()->unique;
+        }
+
+        $this->assertEquals([
+            'title' => false,
+            'slug' => true,
+        ], $attributes);
+    }
+
+    /**
+     * @requires PHP >= 8.1
+     */
+    public function testGetAttributeInstantiatesTheAttributeOfATargetParameter(): void
+    {
+        $targets = Attributes::findTargetParameters(ParameterA::class);
+        $attributes = [];
+
+        foreach ($targets as $target) {
+            $attributes[$target->getName()] = $target->getAttribute()->label;
+        }
+
+        $this->assertEquals([
+            'myParameter' => 'my parameter label',
+            'yetAnotherParameter' => 'my yet another parameter label',
+        ], $attributes);
+    }
+
+    public function testGetAttributeInstantiatesAnAttributeInheritedFromATrait(): void
+    {
+        $targets = Attributes::filterTargetMethods(
+            fn($attribute, $class) => $class === \Acme\PSR4\InheritedAttributeSample::class,
+        );
+
+        $this->assertCount(1, $targets);
+        $this->assertInstanceOf(UrlGetter::class, $targets[0]->getAttribute());
+    }
+
     public function testForClass(): void
     {
         $forClass = Attributes::forClass(ArticleController::class);
@@ -435,7 +502,7 @@ abstract class CollectorTestAbstract extends TestCase
         $methods = [];
 
         foreach ($targets as $target) {
-            $methods[] = [ $target->attribute, $target->name ];
+            $methods[] = [ $target->getAttributeClass(), $target->getName() ];
         }
 
         usort($methods, fn($a, $b) => $a[1] <=> $b[1]);
@@ -455,7 +522,7 @@ abstract class CollectorTestAbstract extends TestCase
         $methods = [];
 
         foreach ($targets as $target) {
-            $methods[] = [ $target->attribute, "$target->class::$target->name" ];
+            $methods[] = [ $target->getAttributeClass(), $target->getClass() . "::" . $target->getName() ];
         }
 
         usort($methods, fn($a, $b) => $a[1] <=> $b[1]);
@@ -475,7 +542,10 @@ abstract class CollectorTestAbstract extends TestCase
         $parameters = [];
 
         foreach ($targets as $target) {
-            $parameters[] = [ $target->attribute, "$target->class::$target->method($target->name)" ];
+            $parameters[] = [
+                $target->getAttributeClass(),
+                $target->getClass() . "::" . $target->getMethod() . "(" . $target->getName() . ")",
+            ];
         }
 
         usort($parameters, fn($a, $b) => $a[1] <=> $b[1]);
@@ -495,7 +565,7 @@ abstract class CollectorTestAbstract extends TestCase
         $properties = [];
 
         foreach ($targets as $target) {
-            $properties[] = [ $target->attribute, "$target->class::$target->name" ];
+            $properties[] = [ $target->getAttributeClass(), $target->getClass() . "::" . $target->getName() ];
         }
 
         usort($properties, fn($a, $b) => $a[1] <=> $b[1]);
