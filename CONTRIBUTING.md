@@ -31,9 +31,15 @@ porting by hand, but don't try to keep the trees mergeable.
 
 ## Running Tests
 
-We provide a Docker container for local development. Run `make test-container` to create a new session. Inside the
-container run `make test` to run the test suite. Alternatively, run `make test-coverage` for a breakdown of the code
-coverage. The coverage report is available in `build/coverage/index.html`.
+Everything the Makefile runs happens inside the image built from the repository's `Dockerfile`, so a
+fresh checkout needs nothing but Docker—no PHP, no Composer, no phpcs on the host. Run `make test`
+for the test suite, `make test-filter FILTER=…` for a subset, and `make test-coverage` for a
+breakdown of the code coverage; the report is available in `build/coverage/index.html`. `make shell`
+opens a session in the image, and `make` on its own lists every target.
+
+The image defaults to PHP 8.4; `make test PHP_VERSION=8.5` builds and uses another one. If you would
+rather use a local toolchain, override `PHP_RUN`—`make test PHP_RUN="sh -c"` runs everything
+directly on the host, which is what the CI does.
 
 **Thanks for your contribution**!
 

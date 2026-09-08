@@ -1,33 +1,30 @@
-ARG PHP_TAG=8.4-cli-bookworm
-ARG COMPOSER_TAG=2.8
+# Development image: everything the Makefile needs to install, analyse and test the plugin.
+#
+#     docker build --build-arg PHP_VERSION=8.4 --tag composer-attribute-collector-dev .
+#
+# It is not used to run the plugin — that happens inside the user's own composer.
+ARG PHP_VERSION=8.4
 
-FROM composer:${COMPOSER_TAG} AS composer_source
-FROM php:${PHP_TAG}
+FROM php:${PHP_VERSION}-cli-alpine
 
-RUN <<-EOF
-	apt-get update
-	apt-get install -y autoconf pkg-config unzip
-	pecl channel-update pecl.php.net
-	pecl install xdebug
-	docker-php-ext-enable xdebug
-EOF
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-RUN <<-EOF
-	cat <<-SHELL >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
-	xdebug.client_host=host.docker.internal
-	xdebug.mode=develop
-	xdebug.start_with_request=yes
-	SHELL
+# git and unzip let composer install from source and from dist; xdebug drives `make test-coverage`
+# and is left off by default, the XDEBUG_MODE environment variable turns it on for a single run.
+RUN apk add --no-cache git unzip \
+    && apk add --no-cache --virtual .build-dependencies $PHPIZE_DEPS linux-headers \
+    && pecl install xdebug \
+    && docker-php-ext-enable xdebug \
+    && apk del .build-dependencies \
+    && printf 'xdebug.mode=off\n' > "$PHP_INI_DIR/conf.d/zz-xdebug-mode.ini"
 
-	cat <<-SHELL >> /usr/local/etc/php/conf.d/php.ini
-	display_errors=On
-	error_reporting=E_ALL
-	date.timezone=UTC
-	SHELL
-EOF
+ENV COMPOSER_ALLOW_SUPERUSER=1
 
-COPY --from=composer_source /usr/bin/composer /usr/bin/composer
-ENV COMPOSER_ALLOW_SUPERUSER 1
-ENV PATH="/root/.composer/vendor/bin:${PATH}"
+# phpcs is not a dev dependency of the plugin, it is baked into the image. It goes to /opt/phpcs
+# rather than the default COMPOSER_HOME, which the Makefile shadows with the host's cache volume.
+RUN COMPOSER_HOME=/opt/phpcs composer global require --no-interaction --no-progress \
+        squizlabs/php_codesniffer \
+    && ln -s /opt/phpcs/vendor/bin/phpcs /usr/local/bin/phpcs \
+    && chmod -R a+rX /opt/phpcs
 
-RUN composer global require squizlabs/php_codesniffer
+WORKDIR /src
