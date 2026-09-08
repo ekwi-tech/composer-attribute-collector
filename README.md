@@ -48,24 +48,30 @@ require_once 'vendor/attributes.php'; // <-- the file created by the plugin
 
 // Find the target classes of the AsMessageHandler attribute.
 foreach (Attributes::findTargetClasses(AsMessageHandler::class) as $target) {
-    // $target->attribute is the name of the attribute class,
-    // $target->name the name of the target class.
-    var_dump($target->attribute, $target->name);
+    // getAttributeClass() is the name of the attribute class,
+    // getName() the name of the target class, and
+    // getAttribute() an instance of the attribute, created on demand.
+    var_dump($target->getAttributeClass(), $target->getName(), $target->getAttribute());
 }
 
 // Find the target methods of the Route attribute.
 foreach (Attributes::findTargetMethods(Route::class) as $target) {
-    var_dump($target->attribute, $target->class, $target->name);
+    var_dump($target->getAttributeClass(), $target->getClass(), $target->getName());
 }
 
 // Find the target properties of the Column attribute.
 foreach (Attributes::findTargetProperties(Column::class) as $target) {
-    var_dump($target->attribute, $target->class, $target->name);
+    var_dump($target->getAttributeClass(), $target->getClass(), $target->getName());
 }
 
 // Find the target method parameters of the UserInput attribute.
 foreach (Attributes::findTargetParameters(UserInput::class) as $target) {
-    var_dump($target->attribute, $target->class, $target->method, $target->name);
+    var_dump(
+        $target->getAttributeClass(),
+        $target->getClass(),
+        $target->getMethod(),
+        $target->getName(),
+    );
 }
 
 // Filter target methods using a predicate.
@@ -75,7 +81,7 @@ $predicate = fn($attribute) => is_a($attribute, Route::class, true);
 $predicate = Attributes::predicateForAttributeInstanceOf(Route::class);
 
 foreach (Attributes::filterTargetMethods($predicate) as $target) {
-    var_dump($target->attribute, $target->class, $target->name);
+    var_dump($target->getAttributeClass(), $target->getClass(), $target->getName());
 }
 
 // Find class, method, and property attribute names for the ArticleController class.
@@ -87,21 +93,24 @@ var_dump($attributes->propertyAttributes);
 ```
 
 > [!IMPORTANT]
-> The plugin collects **names**, not attribute instances: it records which classes, methods,
-> properties, and parameters an attribute is used on, and nothing else. Attribute _arguments_ are
-> not collected, because they can hold arbitrary values—objects in particular—that cannot be
-> rendered as PHP code in the generated file. If you need the arguments of an attribute, use
-> reflection on the target you discovered:
+> The plugin collects **names**, not attribute instances: the generated file records which classes,
+> methods, properties, and parameters an attribute is used on, and nothing else. Attribute
+> _arguments_ are not collected, because they can hold arbitrary values—objects in particular—that
+> cannot be rendered as PHP code in the generated file.
+>
+> If you need the arguments of an attribute, `getAttribute()` instantiates it on demand, using
+> reflection on the target—the instance is created on first use, then reused:
 >
 > ```php
 > foreach (Attributes::findTargetClasses(AsMessageHandler::class) as $target) {
->     $reflection = new ReflectionClass($target->name);
+>     $attribute = $target->getAttribute(); // an AsMessageHandler instance
 >
->     foreach ($reflection->getAttributes($target->attribute) as $attribute) {
->         $instance = $attribute->newInstance();
->     }
+>     var_dump($attribute->fromTransport);
 > }
 > ```
+>
+> Reflection only happens when `getAttribute()` is called; finding targets remains reflection-free.
+> If an attribute is repeatable, `getAttribute()` returns the first one found on the target.
 
 
 

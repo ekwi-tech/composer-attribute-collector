@@ -15,9 +15,11 @@ This fork differs from upstream on two central points:
   `#[CollectableAttribute]` (see `ClassAttributeCollector::isCollectable()`).
 - **Only names are collected, never attribute arguments.** Upstream `var_export`s the arguments so
   that `$target->attribute` can be a hydrated instance; that breaks on any argument PHP cannot
-  export as code (an object without `__set_state()`, typically). Here `$target->attribute` is the
-  attribute **class-string**, and a consumer that needs argument values reflects on
-  `$target->name` / `$target->class` itself.
+  export as code (an object without `__set_state()`, typically). Here the generated file holds only
+  class-strings: `Target*::getAttributeClass()` returns the attribute **class-string**, and
+  `Target*::getAttribute()` instantiates the attribute lazily, by reflecting on the target it
+  describes (`AttributeInstantiator`). Target properties are private; read them through
+  `getName()` / `getClass()` / `getMethod()`.
 
 ## Commands
 
@@ -78,7 +80,8 @@ only to quote individual strings).
 
 `Transient*` classes (`TransientTargetClass/Method/Property/Parameter`) are build-time DTOs holding
 an attribute class name and the name of its target. `TargetClass`, `TargetMethod`, `TargetProperty`,
-`TargetParameter` are the run-time equivalents handed to users. Both sides carry names only —
+`TargetParameter` are the run-time equivalents handed to users; they hold the same names, privately,
+and instantiate the attribute on demand in `getAttribute()`. Both sides carry names only —
 if you ever reintroduce argument capture, it has to survive being rendered as PHP code, which is
 exactly what this fork removed. Adding a new target kind means touching both sides plus
 `TransientCollection`, `TransientCollectionRenderer`, `Collection`, `Attributes`, and `ForClass`.
