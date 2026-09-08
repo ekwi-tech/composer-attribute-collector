@@ -1,6 +1,6 @@
 <?php
 
-namespace tests\olvlvl\ComposerAttributeCollector;
+namespace tests\Ekwi\ComposerAttributeCollector;
 
 use Acme\PSR4\ActiveRecord\Article;
 use Acme\PSR4\CreateMenu;
@@ -8,11 +8,11 @@ use Acme\PSR4\CreateMenuHandler;
 use Acme\PSR4\Presentation\ArticleController;
 use Acme\PSR4\SubscriberA;
 use Attribute;
-use olvlvl\ComposerAttributeCollector\ClassAttributeCollector;
-use olvlvl\ComposerAttributeCollector\TransientTargetClass;
-use olvlvl\ComposerAttributeCollector\TransientTargetMethod;
-use olvlvl\ComposerAttributeCollector\TransientTargetParameter;
-use olvlvl\ComposerAttributeCollector\TransientTargetProperty;
+use Ekwi\ComposerAttributeCollector\ClassAttributeCollector;
+use Ekwi\ComposerAttributeCollector\TransientTargetClass;
+use Ekwi\ComposerAttributeCollector\TransientTargetMethod;
+use Ekwi\ComposerAttributeCollector\TransientTargetParameter;
+use Ekwi\ComposerAttributeCollector\TransientTargetProperty;
 use PHPUnit\Framework\TestCase;
 use ReflectionException;
 

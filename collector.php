@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 
-namespace olvlvl\ComposerAttributeCollector;
+namespace Ekwi\ComposerAttributeCollector;
 
 require 'vendor/autoload.php';
 

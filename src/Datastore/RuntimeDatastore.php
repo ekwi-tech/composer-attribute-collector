@@ -1,8 +1,8 @@
 <?php
 
-namespace olvlvl\ComposerAttributeCollector\Datastore;
+namespace Ekwi\ComposerAttributeCollector\Datastore;
 
-use olvlvl\ComposerAttributeCollector\Datastore;
+use Ekwi\ComposerAttributeCollector\Datastore;
 
 /**
  * @internal

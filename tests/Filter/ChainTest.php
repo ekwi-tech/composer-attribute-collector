@@ -7,13 +7,13 @@
  * file that was distributed with this source code.
  */
 
-namespace tests\olvlvl\ComposerAttributeCollector\Filter;
+namespace tests\Ekwi\ComposerAttributeCollector\Filter;
 
-use olvlvl\ComposerAttributeCollector\Filter;
-use olvlvl\ComposerAttributeCollector\Logger;
+use Ekwi\ComposerAttributeCollector\Filter;
+use Ekwi\ComposerAttributeCollector\Logger;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use tests\olvlvl\ComposerAttributeCollector\FakeLogger;
+use tests\Ekwi\ComposerAttributeCollector\FakeLogger;
 
 final class ChainTest extends TestCase
 {

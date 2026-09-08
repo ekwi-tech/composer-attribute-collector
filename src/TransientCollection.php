@@ -1,6 +1,6 @@
 <?php
 
-namespace olvlvl\ComposerAttributeCollector;
+namespace Ekwi\ComposerAttributeCollector;
 
 /**
  * A collection of attributes used during the collection process.

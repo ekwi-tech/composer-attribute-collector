@@ -7,10 +7,10 @@
  * file that was distributed with this source code.
  */
 
-namespace tests\olvlvl\ComposerAttributeCollector\Filter;
+namespace tests\Ekwi\ComposerAttributeCollector\Filter;
 
-use olvlvl\ComposerAttributeCollector\Filter\ContentFilter;
-use olvlvl\ComposerAttributeCollector\Logger;
+use Ekwi\ComposerAttributeCollector\Filter\ContentFilter;
+use Ekwi\ComposerAttributeCollector\Logger;
 use PHPUnit\Framework\MockObject\MockObject as MockObjectAlias;
 use PHPUnit\Framework\TestCase;
 

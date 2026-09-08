@@ -1,9 +1,9 @@
 <?php
 
-namespace tests\olvlvl\ComposerAttributeCollector\Logger;
+namespace tests\Ekwi\ComposerAttributeCollector\Logger;
 
 use Composer\IO\IOInterface;
-use olvlvl\ComposerAttributeCollector\Logger\ComposerLogger;
+use Ekwi\ComposerAttributeCollector\Logger\ComposerLogger;
 use PHPUnit\Framework\TestCase;
 
 final class ComposerLoggerTest extends TestCase

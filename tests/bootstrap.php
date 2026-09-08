@@ -1,8 +1,8 @@
 <?php
 
-namespace tests\olvlvl\ComposerAttributeCollector;
+namespace tests\Ekwi\ComposerAttributeCollector;
 
-use olvlvl\ComposerAttributeCollector\Plugin;
+use Ekwi\ComposerAttributeCollector\Plugin;
 
 use function dirname;
 use function is_dir;

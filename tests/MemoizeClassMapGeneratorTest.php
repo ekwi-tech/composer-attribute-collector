@@ -1,9 +1,9 @@
 <?php
 
-namespace tests\olvlvl\ComposerAttributeCollector;
+namespace tests\Ekwi\ComposerAttributeCollector;
 
-use olvlvl\ComposerAttributeCollector\Datastore\FileDatastore;
-use olvlvl\ComposerAttributeCollector\MemoizeClassMapGenerator;
+use Ekwi\ComposerAttributeCollector\Datastore\FileDatastore;
+use Ekwi\ComposerAttributeCollector\MemoizeClassMapGenerator;
 use PHPUnit\Framework\TestCase;
 
 use function file_exists;

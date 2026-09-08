@@ -1,8 +1,8 @@
 <?php
 
-namespace tests\olvlvl\ComposerAttributeCollector;
+namespace tests\Ekwi\ComposerAttributeCollector;
 
-use olvlvl\ComposerAttributeCollector\Logger;
+use Ekwi\ComposerAttributeCollector\Logger;
 
 final class FakeLogger implements Logger
 {

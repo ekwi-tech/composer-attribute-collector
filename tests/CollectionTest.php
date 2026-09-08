@@ -1,6 +1,6 @@
 <?php
 
-namespace tests\olvlvl\ComposerAttributeCollector;
+namespace tests\Ekwi\ComposerAttributeCollector;
 
 use Acme\Attribute\ActiveRecord\Id;
 use Acme\Attribute\ActiveRecord\Index;
@@ -17,12 +17,12 @@ use Acme\PSR4\ActiveRecord\Article;
 use Acme\PSR4\Presentation\ArticleController;
 use Acme81\Attribute\ParameterA;
 use Acme81\Attribute\ParameterB;
-use olvlvl\ComposerAttributeCollector\Attributes;
-use olvlvl\ComposerAttributeCollector\Collection;
-use olvlvl\ComposerAttributeCollector\TargetClass;
-use olvlvl\ComposerAttributeCollector\TargetMethod;
-use olvlvl\ComposerAttributeCollector\TargetParameter;
-use olvlvl\ComposerAttributeCollector\TargetProperty;
+use Ekwi\ComposerAttributeCollector\Attributes;
+use Ekwi\ComposerAttributeCollector\Collection;
+use Ekwi\ComposerAttributeCollector\TargetClass;
+use Ekwi\ComposerAttributeCollector\TargetMethod;
+use Ekwi\ComposerAttributeCollector\TargetParameter;
+use Ekwi\ComposerAttributeCollector\TargetProperty;
 use PHPUnit\Framework\TestCase;
 
 use function in_array;

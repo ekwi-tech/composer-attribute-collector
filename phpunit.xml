@@ -8,7 +8,7 @@
 		</include>
 	</coverage>
 	<testsuites>
-		<testsuite name="olvlvl/composer-attribute-collector">
+		<testsuite name="ekwi-tech/composer-attribute-collector">
 			<directory>./tests</directory>
 		</testsuite>
 	</testsuites>

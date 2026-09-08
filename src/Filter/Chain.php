@@ -1,9 +1,9 @@
 <?php
 
-namespace olvlvl\ComposerAttributeCollector\Filter;
+namespace Ekwi\ComposerAttributeCollector\Filter;
 
-use olvlvl\ComposerAttributeCollector\Filter;
-use olvlvl\ComposerAttributeCollector\Logger;
+use Ekwi\ComposerAttributeCollector\Filter;
+use Ekwi\ComposerAttributeCollector\Logger;
 
 final class Chain implements Filter
 {

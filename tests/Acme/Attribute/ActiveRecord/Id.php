@@ -3,7 +3,7 @@
 namespace Acme\Attribute\ActiveRecord;
 
 use Attribute;
-use olvlvl\ComposerAttributeCollector\CollectableAttribute;
+use Ekwi\ComposerAttributeCollector\CollectableAttribute;
 
 /**
  * Marks one or multiple properties that constitute the record identifier i.e. the primary key in the database.

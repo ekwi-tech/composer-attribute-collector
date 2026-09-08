@@ -7,7 +7,7 @@
  * file that was distributed with this source code.
  */
 
-namespace tests\olvlvl\ComposerAttributeCollector;
+namespace tests\Ekwi\ComposerAttributeCollector;
 
 use Acme\Attribute\ActiveRecord\Boolean;
 use Acme\Attribute\ActiveRecord\Id;
@@ -27,12 +27,12 @@ use Acme\Attribute\Subscribe;
 use Acme\PSR4\Presentation\ArticleController;
 use Acme81\Attribute\ParameterA;
 use Acme81\Attribute\ParameterB;
-use olvlvl\ComposerAttributeCollector\Attributes;
-use olvlvl\ComposerAttributeCollector\Config;
-use olvlvl\ComposerAttributeCollector\TargetClass;
-use olvlvl\ComposerAttributeCollector\TargetMethod;
-use olvlvl\ComposerAttributeCollector\TargetParameter;
-use olvlvl\ComposerAttributeCollector\TargetProperty;
+use Ekwi\ComposerAttributeCollector\Attributes;
+use Ekwi\ComposerAttributeCollector\Config;
+use Ekwi\ComposerAttributeCollector\TargetClass;
+use Ekwi\ComposerAttributeCollector\TargetMethod;
+use Ekwi\ComposerAttributeCollector\TargetParameter;
+use Ekwi\ComposerAttributeCollector\TargetProperty;
 use PhpParser\Node\Param;
 use PHPUnit\Framework\TestCase;
 use ReflectionException;

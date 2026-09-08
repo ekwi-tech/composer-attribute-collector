@@ -1,9 +1,9 @@
 <?php
 
-namespace tests\olvlvl\ComposerAttributeCollector;
+namespace tests\Ekwi\ComposerAttributeCollector;
 
-use olvlvl\ComposerAttributeCollector\Collector;
-use olvlvl\ComposerAttributeCollector\Config;
+use Ekwi\ComposerAttributeCollector\Collector;
+use Ekwi\ComposerAttributeCollector\Config;
 
 final class CollectorTest extends CollectorTestAbstract
 {

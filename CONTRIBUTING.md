@@ -4,6 +4,17 @@ Contributions are **welcome** and will be fully **credited**.
 
 We accept contributions via Pull Requests.
 
+## This project is a fork
+
+This repository is a fork of [olvlvl/composer-attribute-collector][upstream]. Open your issues and
+pull requests **here**, against `ekwi-tech/composer-attribute-collector`, never against the upstream
+repository—the fork carries changes upstream did not ask for, and its `main` has diverged.
+
+The fork no longer merges upstream changes: the two code bases have diverged too far for a
+synchronization to be worth its cost, and the classes have moved to the
+`Ekwi\ComposerAttributeCollector` namespace. Read upstream for inspiration, port what is worth
+porting by hand, but don't try to keep the trees mergeable.
+
 ## Pull Requests
 
 - **Code style** — We're following a [Coding Standard][]. Check the code style with `make lint`.
@@ -28,5 +39,6 @@ coverage. The coverage report is available in `build/coverage/index.html`.
 
 
 [Coding Standard]: phpcs.xml
+[upstream]: https://github.com/olvlvl/composer-attribute-collector
 [git-squash]: http://www.git-scm.com/book/en/v2/Git-Tools-Rewriting-History#Changing-Multiple-Commit-Messages
 [PHPStan]: https://phpstan.org/user-guide/getting-started
