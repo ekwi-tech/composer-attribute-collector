@@ -25,21 +25,28 @@ The fork no longer synchronizes with upstream and lives in its own
 
 ## Commands
 
+**There is no PHP on the host.** Every target runs inside the image built from `Dockerfile`
+(`php:8.4-cli-alpine` + xdebug + composer + a phpcs baked into `/opt/phpcs`), so drive the toolchain
+through `make`, never through a bare `php` or `vendor/bin/…` call.
+
 ```shell
+make                   # list every target
 make test              # composer install + clean sandboxes + phpunit
+make test-filter FILTER=testTargetMethods
 make test-coverage     # HTML coverage in build/coverage
 make lint              # phpcs -s (PSR-12) + phpstan level max on src/
-make test-container    # run the suite in the PHP 8.4 docker image
-vendor/bin/phpunit --filter testTargetMethods tests/CollectorTest.php
-vendor/bin/phpunit tests/ConfigTest.php
+make shell             # interactive shell in the image
+make test PHP_VERSION=8.5
 ```
+
+The container runs as the invoking user (`--user $(id -u):$(id -g)`) so nothing it writes ends up
+root-owned; `HOME=/tmp` and a composer cache in `var/composer` (gitignored) keep it self-contained.
+`PHP_RUN="sh -c"` bypasses docker and runs on a local toolchain — that is what
+`.github/workflows/test.yml` passes, since the CI brings its own PHP.
 
 `make test-cleanup` wipes `.composer-attribute-collector/` (cache) and `tests/sandbox/`. Run it, or
 the full `make test`, if a stale generated `tests/sandbox/attributes.php` makes tests behave oddly —
 `CollectorTestAbstract` generates that file once per test class and `require`s it.
-
-phpcs is expected to be installed globally (the Dockerfile does `composer global require
-squizlabs/php_codesniffer`); phpstan comes from `vendor/`.
 
 ## Architecture
 
