@@ -1,10 +1,10 @@
 <?php
 
-namespace olvlvl\ComposerAttributeCollector\Datastore;
+namespace Ekwi\ComposerAttributeCollector\Datastore;
 
-use olvlvl\ComposerAttributeCollector\Datastore;
-use olvlvl\ComposerAttributeCollector\Logger;
-use olvlvl\ComposerAttributeCollector\Plugin;
+use Ekwi\ComposerAttributeCollector\Datastore;
+use Ekwi\ComposerAttributeCollector\Logger;
+use Ekwi\ComposerAttributeCollector\Plugin;
 
 use function file_exists;
 use function file_get_contents;

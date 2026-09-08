@@ -3,12 +3,13 @@
 > [!NOTE]
 > **This is a fork of [olvlvl/composer-attribute-collector][upstream].**
 > All the credit for the original design and implementation goes to [Olivier Laviale][olvlvl] and
-> the contributors of the upstream project—this fork only carries a handful of opinionated changes
-> on top of their work, and keeps tracking upstream. It is distributed as
-> `ekwi-tech/composer-attribute-collector`, under the same [BSD-3-Clause license](LICENSE).
+> the contributors of the upstream project—this fork carries a handful of opinionated changes on
+> top of their work. It is distributed as `ekwi-tech/composer-attribute-collector`, in the
+> `Ekwi\ComposerAttributeCollector` namespace, under the same
+> [BSD-3-Clause license](LICENSE).
 >
-> The public API is **not** compatible with upstream: read
-> [Differences from upstream](#differences-from-upstream) before switching.
+> The fork has diverged for good: it no longer tracks upstream, and its public API is **not**
+> compatible. Read [Differences from upstream](#differences-from-upstream) before switching.
 
 **composer-attribute-collector** is a [Composer][] plugin designed to effectively _discover_ PHP 8
 attribute targets, and later retrieve them at near zero cost, without runtime reflection. After the
@@ -50,18 +51,25 @@ Upstream exposes public properties, and its `attribute` property holds an instan
 
 Upstream supports PHP 8.0 and up; this fork requires PHP 8.4.
 
-### 5. New package name, same namespace
+### 5. New package name, new namespace
 
-The package is `ekwi-tech/composer-attribute-collector`, but the classes keep the original
-`olvlvl\ComposerAttributeCollector` namespace, on purpose: the fork merges upstream changes every
-month, and renaming the namespace would turn each of those merges into a conflict on every single
-file. Your `use` statements are therefore unchanged when you switch.
+The package is `ekwi-tech/composer-attribute-collector` and its classes live in
+`Ekwi\ComposerAttributeCollector`. Coming from upstream, rewrite your imports:
+
+```diff
+-use olvlvl\ComposerAttributeCollector\Attributes;
+-use olvlvl\ComposerAttributeCollector\CollectableAttribute;
++use Ekwi\ComposerAttributeCollector\Attributes;
++use Ekwi\ComposerAttributeCollector\CollectableAttribute;
+```
+
+The generated "attributes" file names those classes too, but it is rewritten on every
+`composer dump-autoload`, so there is nothing to migrate by hand.
 
 > [!IMPORTANT]
-> The package declares `replace: { "olvlvl/composer-attribute-collector": "self.version" }`, so it
-> cannot be installed side by side with upstream, and Composer considers any requirement of the
-> upstream package satisfied. That is convenient for an application that switches deliberately, but
-> a third-party dependency written against upstream's API will **not** work with this fork.
+> The fork does not `replace` the upstream package: Composer will happily install both, and both
+> plugins would then write `vendor/attributes.php`, each undoing the other. Require one or the
+> other, never the two together.
 
 
 
@@ -92,7 +100,7 @@ The following example demonstrates how targets and their attributes can be retri
 ```php
 <?php
 
-use olvlvl\ComposerAttributeCollector\Attributes;
+use Ekwi\ComposerAttributeCollector\Attributes;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\ORM\Mapping\Column;
@@ -210,7 +218,7 @@ improving performance and reducing noise.
 namespace App\Attribute;
 
 use Attribute;
-use olvlvl\ComposerAttributeCollector\CollectableAttribute;
+use Ekwi\ComposerAttributeCollector\CollectableAttribute;
 
 #[CollectableAttribute]
 #[Attribute(Attribute::TARGET_CLASS)]
@@ -360,7 +368,7 @@ PHP. If the plugin is too slow for your liking, try running the command with
 To speed up the collection process, the plugin first looks at PHP files as plain text for hints of
 attribute usage. If a class inherits its attributes from traits, properties, or methods, but doesn't
 use attributes itself, it will be ignored. Use the attribute
-`#[olvlvl\ComposerAttributeCollector\InheritsAttributes]` to force the collection.
+`#[Ekwi\ComposerAttributeCollector\InheritsAttributes]` to force the collection.
 Note that the attributes you want to collect must still be marked with `#[CollectableAttribute]`.
 
 ```php

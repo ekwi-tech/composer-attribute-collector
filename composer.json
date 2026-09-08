@@ -23,12 +23,12 @@
   },
   "autoload": {
     "psr-4": {
-      "olvlvl\\ComposerAttributeCollector\\": "src"
+      "Ekwi\\ComposerAttributeCollector\\": "src"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "tests\\olvlvl\\ComposerAttributeCollector\\": "tests",
+      "tests\\Ekwi\\ComposerAttributeCollector\\": "tests",
       "Acme\\": "tests/Acme",
       "Acme81\\": "tests/Acme81"
     },
@@ -49,11 +49,8 @@
     "phpstan/phpstan": "^2.1.17",
     "phpunit/phpunit": "^9.6.23"
   },
-  "replace": {
-    "olvlvl/composer-attribute-collector": "self.version"
-  },
   "extra": {
-    "class": "olvlvl\\ComposerAttributeCollector\\Plugin",
+    "class": "Ekwi\\ComposerAttributeCollector\\Plugin",
     "composer-attribute-collector": {
       "include": [
         "tests"

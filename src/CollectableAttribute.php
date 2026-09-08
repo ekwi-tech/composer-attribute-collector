@@ -1,6 +1,6 @@
 <?php
 
-namespace olvlvl\ComposerAttributeCollector;
+namespace Ekwi\ComposerAttributeCollector;
 
 /**
  * Marks an attribute as collectable by the collector.

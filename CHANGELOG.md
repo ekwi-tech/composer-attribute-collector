@@ -13,10 +13,7 @@ None
 
 ### New features
 
-`TargetClass`, `TargetMethod`, `TargetProperty`, and `TargetParameter` have a `getAttribute()`
-method that instantiates the attribute on demand, using reflection on the target. The instance is
-created on first use, then reused. For a repeatable attribute, the first one found on the target is
-returned.
+None
 
 ### Deprecated Features
 
@@ -24,10 +21,7 @@ None
 
 ### Backward Incompatible Changes
 
-The properties of `TargetClass`, `TargetMethod`, `TargetProperty`, and `TargetParameter` are now
-private and replaced by accessors: `getAttributeClass()` (the name of the attribute class),
-`getName()`, `getClass()`, and `getMethod()`. The constructors are unchanged: they still take the
-name of the attribute class first.
+None
 
 ### Other Changes
 
@@ -42,7 +36,10 @@ None
 
 ### New features
 
-None
+`TargetClass`, `TargetMethod`, `TargetProperty`, and `TargetParameter` have a `getAttribute()`
+method that instantiates the attribute on demand, using reflection on the target. The instance is
+created on first use, then reused. For a repeatable attribute, the first one found on the target is
+returned.
 
 ### Deprecated Features
 
@@ -50,18 +47,29 @@ None
 
 ### Backward Incompatible Changes
 
-Attribute arguments are no longer collected. The generated "attributes" file now only records the
-names of the attributes and of their targets, because arguments can hold arbitrary values—objects,
-in particular—that cannot be rendered as PHP code and break the generated file unless they
-implement `__set_state()`.
+The classes moved from the `olvlvl\ComposerAttributeCollector` namespace to
+`Ekwi\ComposerAttributeCollector`. Rewrite your imports; the generated "attributes" file is
+refreshed on the next `composer dump-autoload` and needs no manual migration.
 
-As a consequence, the `attribute` property of a target is the **name** of the attribute class
-instead of an instance of it, and `ForClass` exposes attribute names instead of instances. Use
-reflection on the discovered target if you need the arguments of an attribute.
+The package no longer declares `replace: { "olvlvl/composer-attribute-collector": "self.version" }`.
+It is not a drop-in replacement for upstream and no longer pretends to be one. Composer can now
+install both packages at once—don't: both plugins write `vendor/attributes.php`.
+
+Attribute arguments are no longer collected. The generated "attributes" file only records the names
+of the attributes and of their targets, because arguments can hold arbitrary values—objects, in
+particular—that cannot be rendered as PHP code and break the generated file unless they implement
+`__set_state()`.
+
+The properties of `TargetClass`, `TargetMethod`, `TargetProperty`, and `TargetParameter` are private
+and replaced by accessors: `getAttributeClass()` (the name of the attribute class), `getName()`,
+`getClass()`, and `getMethod()`. The constructors are unchanged: they still take the name of the
+attribute class first. `getAttributeClass()` returns the **name** of the attribute class where
+upstream's `attribute` property holds an instance, and `ForClass` exposes attribute names instead of
+instances.
 
 ### Other Changes
 
-None
+The fork stopped synchronizing with upstream; the monthly `Sync upstream` workflow is gone.
 
 
 ## v2.1.2

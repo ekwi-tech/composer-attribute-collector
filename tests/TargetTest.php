@@ -1,6 +1,6 @@
 <?php
 
-namespace tests\olvlvl\ComposerAttributeCollector;
+namespace tests\Ekwi\ComposerAttributeCollector;
 
 use Acme\Attribute\ActiveRecord\Varchar;
 use Acme\Attribute\Permission;
@@ -11,10 +11,10 @@ use Acme\PSR4\CreateMenu;
 use Acme\PSR4\Presentation\ArticleController;
 use Acme81\Attribute\ParameterA;
 use LogicException;
-use olvlvl\ComposerAttributeCollector\TargetClass;
-use olvlvl\ComposerAttributeCollector\TargetMethod;
-use olvlvl\ComposerAttributeCollector\TargetParameter;
-use olvlvl\ComposerAttributeCollector\TargetProperty;
+use Ekwi\ComposerAttributeCollector\TargetClass;
+use Ekwi\ComposerAttributeCollector\TargetMethod;
+use Ekwi\ComposerAttributeCollector\TargetParameter;
+use Ekwi\ComposerAttributeCollector\TargetProperty;
 use PHPUnit\Framework\TestCase;
 
 final class TargetTest extends TestCase

@@ -2,10 +2,10 @@
 
 namespace Acme\Filter;
 
-use olvlvl\ComposerAttributeCollector\Filter\ClassFilter;
-use olvlvl\ComposerAttributeCollector\Logger;
+use Ekwi\ComposerAttributeCollector\Filter\ClassFilter;
+use Ekwi\ComposerAttributeCollector\Logger;
 use PHPUnit\Framework\TestCase;
-use tests\olvlvl\ComposerAttributeCollector\FakeLogger;
+use tests\Ekwi\ComposerAttributeCollector\FakeLogger;
 
 final class ClassFilterTest extends TestCase
 {

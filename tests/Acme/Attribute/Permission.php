@@ -10,7 +10,7 @@
 namespace Acme\Attribute;
 
 use Attribute;
-use olvlvl\ComposerAttributeCollector\CollectableAttribute;
+use Ekwi\ComposerAttributeCollector\CollectableAttribute;
 
 #[CollectableAttribute]
 #[Attribute(Attribute::TARGET_CLASS | Attribute::IS_REPEATABLE)]

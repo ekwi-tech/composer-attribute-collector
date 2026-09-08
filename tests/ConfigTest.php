@@ -1,11 +1,11 @@
 <?php
 
-namespace tests\olvlvl\ComposerAttributeCollector;
+namespace tests\Ekwi\ComposerAttributeCollector;
 
 use Composer\Package\RootPackageInterface;
 use Composer\PartialComposer;
 use Composer\Util\Platform;
-use olvlvl\ComposerAttributeCollector\Config;
+use Ekwi\ComposerAttributeCollector\Config;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 

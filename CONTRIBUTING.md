@@ -10,9 +10,10 @@ This repository is a fork of [olvlvl/composer-attribute-collector][upstream]. Op
 pull requests **here**, against `ekwi-tech/composer-attribute-collector`, never against the upstream
 repository—the fork carries changes upstream did not ask for, and its `main` has diverged.
 
-Upstream changes are merged into the fork every month by the `Sync upstream` workflow, which opens a
-pull request rather than merging on its own. Keeping the diff with upstream small is a goal in
-itself: prefer a change that survives the next sync over one that rewrites shared code.
+The fork no longer merges upstream changes: the two code bases have diverged too far for a
+synchronization to be worth its cost, and the classes have moved to the
+`Ekwi\ComposerAttributeCollector` namespace. Read upstream for inspiration, port what is worth
+porting by hand, but don't try to keep the trees mergeable.
 
 ## Pull Requests
 

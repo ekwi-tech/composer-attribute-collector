@@ -1,9 +1,9 @@
 <?php
 
-namespace olvlvl\ComposerAttributeCollector\Logger;
+namespace Ekwi\ComposerAttributeCollector\Logger;
 
 use Composer\IO\IOInterface;
-use olvlvl\ComposerAttributeCollector\Logger;
+use Ekwi\ComposerAttributeCollector\Logger;
 
 /**
  * @internal

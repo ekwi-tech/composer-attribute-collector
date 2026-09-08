@@ -7,7 +7,7 @@
  * file that was distributed with this source code.
  */
 
-namespace tests\olvlvl\ComposerAttributeCollector\Filter\ContentFilterCases;
+namespace tests\Ekwi\ComposerAttributeCollector\Filter\ContentFilterCases;
 
 #[SomeAttribute]
 class ClassWithAttribute

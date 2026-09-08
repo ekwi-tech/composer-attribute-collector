@@ -1,11 +1,11 @@
 <?php
 
-namespace olvlvl\ComposerAttributeCollector;
+namespace Ekwi\ComposerAttributeCollector;
 
-use olvlvl\ComposerAttributeCollector\Datastore\FileDatastore;
-use olvlvl\ComposerAttributeCollector\Datastore\RuntimeDatastore;
-use olvlvl\ComposerAttributeCollector\Filter\ClassFilter;
-use olvlvl\ComposerAttributeCollector\Filter\ContentFilter;
+use Ekwi\ComposerAttributeCollector\Datastore\FileDatastore;
+use Ekwi\ComposerAttributeCollector\Datastore\RuntimeDatastore;
+use Ekwi\ComposerAttributeCollector\Filter\ClassFilter;
+use Ekwi\ComposerAttributeCollector\Filter\ContentFilter;
 use RuntimeException;
 
 /**

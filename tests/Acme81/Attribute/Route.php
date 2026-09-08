@@ -3,7 +3,7 @@
 namespace Acme81\Attribute;
 
 use Attribute;
-use olvlvl\ComposerAttributeCollector\CollectableAttribute;
+use Ekwi\ComposerAttributeCollector\CollectableAttribute;
 
 #[CollectableAttribute]
 #[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_METHOD)]

@@ -3,7 +3,7 @@
 namespace Acme\Attribute\ActiveRecord;
 
 use Attribute;
-use olvlvl\ComposerAttributeCollector\CollectableAttribute;
+use Ekwi\ComposerAttributeCollector\CollectableAttribute;
 
 /**
  * An index on one or multiple columns.

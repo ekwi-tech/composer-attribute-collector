@@ -1,10 +1,10 @@
 <?php
 
-namespace tests\olvlvl\ComposerAttributeCollector;
+namespace tests\Ekwi\ComposerAttributeCollector;
 
-use olvlvl\ComposerAttributeCollector\Datastore\FileDatastore;
-use olvlvl\ComposerAttributeCollector\Logger;
-use olvlvl\ComposerAttributeCollector\Plugin;
+use Ekwi\ComposerAttributeCollector\Datastore\FileDatastore;
+use Ekwi\ComposerAttributeCollector\Logger;
+use Ekwi\ComposerAttributeCollector\Plugin;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 

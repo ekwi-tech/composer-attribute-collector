@@ -4,12 +4,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-A Composer plugin (`olvlvl/composer-attribute-collector`, fork requiring PHP >= 8.4) that hooks
+A Composer plugin (`ekwi-tech/composer-attribute-collector`, a detached fork of
+`olvlvl/composer-attribute-collector` requiring PHP >= 8.4) that hooks
 `post-autoload-dump` and generates `vendor/attributes.php`: a static, reflection-free map of PHP 8
 attribute targets (classes, methods, properties, parameters). Consumers read it through the
 `Attributes` facade.
 
-This fork differs from upstream on two central points:
+The fork no longer synchronizes with upstream and lives in its own
+`Ekwi\ComposerAttributeCollector` namespace. It differs from upstream on two central points:
 
 - **Collection is opt-in.** An attribute is only collected if the attribute class itself is marked
   `#[CollectableAttribute]` (see `ClassAttributeCollector::isCollectable()`).

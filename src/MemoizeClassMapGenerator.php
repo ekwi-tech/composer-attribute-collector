@@ -1,6 +1,6 @@
 <?php
 
-namespace olvlvl\ComposerAttributeCollector;
+namespace Ekwi\ComposerAttributeCollector;
 
 use Composer\ClassMapGenerator\ClassMapGenerator;
 use DirectoryIterator;
