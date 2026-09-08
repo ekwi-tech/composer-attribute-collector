@@ -8,11 +8,11 @@ require 'vendor/autoload.php';
 
 $actual = Attributes::findTargetClasses(SampleAttribute::class);
 $expected = [
-    new TargetClass(SampleAttribute::class, App\Models\User::class),
-    new TargetClass(SampleAttribute::class, App\Providers\AppServiceProvider::class),
+    new TargetClass(new SampleAttribute(), App\Models\User::class),
+    new TargetClass(new SampleAttribute(), App\Providers\AppServiceProvider::class),
 ];
 
-$sortFn = fn($a, $b) => strcmp($a->getName(), $b->getName());
+$sortFn = fn($a, $b) => strcmp($a->name, $b->name);
 
 usort($actual, $sortFn);
 usort($expected, $sortFn);

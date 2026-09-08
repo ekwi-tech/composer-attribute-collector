@@ -14,7 +14,7 @@ require 'vendor/autoload.php';
 #
 $actual = Attributes::findTargetClasses(AsController::class);
 $expected = [
-    new TargetClass(AsController::class, HelloController::class),
+    new TargetClass(new AsController(), HelloController::class),
 ];
 
 var_dump($actual);
@@ -28,7 +28,7 @@ $actual == $expected or throw new RuntimeException("Target classes don't match")
 $actual = Attributes::findTargetMethods(Route::class);
 $expected = [
     new TargetMethod(
-        Route::class,
+        new Route('/hello', name: 'hello', methods: [ 'GET' ]),
         HelloController::class,
         'index',
     ),
