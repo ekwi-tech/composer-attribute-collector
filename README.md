@@ -1,8 +1,14 @@
 # composer-attribute-collector
 
-[![Release](https://img.shields.io/packagist/v/olvlvl/composer-attribute-collector.svg)](https://packagist.org/packages/olvlvl/composer-attribute-collector)
-[![Code Coverage](https://coveralls.io/repos/github/olvlvl/composer-attribute-collector/badge.svg?branch=main)](https://coveralls.io/r/olvlvl/composer-attribute-collector?branch=main)
-[![Downloads](https://img.shields.io/packagist/dt/olvlvl/composer-attribute-collector.svg)](https://packagist.org/packages/olvlvl/composer-attribute-collector)
+> [!NOTE]
+> **This is a fork of [olvlvl/composer-attribute-collector][upstream].**
+> All the credit for the original design and implementation goes to [Olivier Laviale][olvlvl] and
+> the contributors of the upstream project—this fork only carries a handful of opinionated changes
+> on top of their work, and keeps tracking upstream. It is distributed as
+> `ekwi-tech/composer-attribute-collector`, under the same [BSD-3-Clause license](LICENSE).
+>
+> The public API is **not** compatible with upstream: read
+> [Differences from upstream](#differences-from-upstream) before switching.
 
 **composer-attribute-collector** is a [Composer][] plugin designed to effectively _discover_ PHP 8
 attribute targets, and later retrieve them at near zero cost, without runtime reflection. After the
@@ -12,14 +18,62 @@ analysis. (For known targets, traditional reflection remains an option.)
 
 
 
+## Differences from upstream
+
+A handful of deliberate changes; everything else—configuration, caching, the generated file, the
+`Attributes` facade—behaves like [upstream][].
+
+### 1. Collection is opt-in
+
+Upstream collects every attribute it finds. Here an attribute is collected only if its own class is
+marked with `#[CollectableAttribute]`, which keeps the generated file small and focused on the
+attributes you actually query. See [Mark collectable attributes](#2-mark-collectable-attributes).
+
+### 2. Attribute arguments are never dumped
+
+Upstream `var_export`s the arguments of an attribute into the generated file so that `$target->attribute`
+can be a ready-made instance. That breaks on any argument PHP cannot render as code—an object
+without `__set_state()`, typically.
+
+This fork records **names only**. When you need the arguments, `getAttribute()` instantiates the
+attribute on demand by reflecting on the target it describes, and reuses the instance afterwards.
+Finding targets stays reflection-free.
+
+### 3. Targets are accessor-based
+
+The properties of `TargetClass`, `TargetMethod`, `TargetProperty`, and `TargetParameter` are
+private, and read through `getAttributeClass()`, `getName()`, `getClass()`, and `getMethod()`.
+Upstream exposes public properties, and its `attribute` property holds an instance where
+`getAttributeClass()` holds a class-string.
+
+### 4. PHP >= 8.4
+
+Upstream supports PHP 8.0 and up; this fork requires PHP 8.4.
+
+### 5. New package name, same namespace
+
+The package is `ekwi-tech/composer-attribute-collector`, but the classes keep the original
+`olvlvl\ComposerAttributeCollector` namespace, on purpose: the fork merges upstream changes every
+month, and renaming the namespace would turn each of those merges into a conflict on every single
+file. Your `use` statements are therefore unchanged when you switch.
+
+> [!IMPORTANT]
+> The package declares `replace: { "olvlvl/composer-attribute-collector": "self.version" }`, so it
+> cannot be installed side by side with upstream, and Composer considers any requirement of the
+> upstream package satisfied. That is convenient for an application that switches deliberately, but
+> a third-party dependency written against upstream's API will **not** work with this fork.
+
+
+
 #### Features
 
-- Zero configuration
-- No reflection in the generated file
+- Almost zero configuration: mark the attributes you want collected, and you're done
+- No reflection when finding targets
 - Might improve performance
 - No dependency (except Composer of course)
-- A single interface to get attribute targets: classes, methods, and properties
+- A single interface to get attribute targets: classes, methods, properties, and parameters
 - Only names are collected, so no attribute argument can break the generated file
+- Attributes are still available, instantiated on demand with `getAttribute()`
 - Can cache discoveries to speed up consecutive runs.
 
 > [!NOTE]
@@ -118,7 +172,33 @@ var_dump($attributes->propertyAttributes);
 
 Here are a few steps to get you started.
 
-### 1\. Mark collectable attributes
+### 1\. Install the plugin
+
+The package is not published on [packagist.org][]: it is resolved from the Git tags of this
+repository. Declare the repository, then require the package with [Composer][]. You will be asked
+if you trust the plugin and wish to activate it, select `y` to proceed.
+
+```shell
+composer config repositories.composer-attribute-collector vcs https://github.com/ekwi-tech/composer-attribute-collector
+composer require ekwi-tech/composer-attribute-collector
+```
+
+You should see log messages similar to this:
+
+```
+Generating autoload files
+Generating attributes file
+Generated attributes file in 9.137 ms
+Generated autoload files
+```
+
+> [!TIP]
+> See the [Frequently Asked Questions](#frequently-asked-questions) section
+> to automatically refresh the "attributes" file during development.
+
+
+
+### 2\. Mark collectable attributes
 
 For an attribute to be collected, it must be marked with the `#[CollectableAttribute]` attribute.
 This opt-in strategy ensures that only the attributes you're interested in are collected,
@@ -139,7 +219,7 @@ final class MyAttribute
 }
 ```
 
-### 2\. Configure the plugin (optional)
+### 3\. Configure the plugin (optional)
 
 The collector automatically scans `autoload` paths of the root `composer.json` for a
 zero-configuration experience. You can override them via
@@ -161,31 +241,7 @@ Check the [Configuration options](#configuration) for more details.
 
 
 
-### 2\. Install the plugin
-
-Use [Composer][] to install the plugin.
-You will be asked if you trust the plugin and wish to activate it, select `y` to proceed.
-
-```shell
-composer require olvlvl/composer-attribute-collector
-```
-
-You should see log messages similar to this:
-
-```
-Generating autoload files
-Generating attributes file
-Generated attributes file in 9.137 ms
-Generated autoload files
-```
-
-> [!TIP]
-> See the [Frequently Asked Questions](#frequently-asked-questions) section
-> to automatically refresh the "attributes" file during development.
-
-
-
-### 3\. Autoload the "attributes" file
+### 4\. Autoload the "attributes" file
 
 You can require the "attributes" file using `require_once 'vendor/attributes.php';` but you might
 prefer to use Composer's autoloading feature:
@@ -272,6 +328,12 @@ Use cases are available to test the plugin in real conditions:
 
 - [Laravel](cases/laravel) A Laravel application, created with `laravel new`.
 
+> [!WARNING]
+> The Symfony and Laravel cases still require `olvlvl/composer-attribute-collector` and Composer
+> resolves it from packagist.org rather than from the local `path` repository, so those two
+> currently exercise **upstream**, not this fork. They need to be rewired: requiring the fork by
+> its own name, and using attributes of their own that can be marked `#[CollectableAttribute]`.
+
 
 
 ## Frequently Asked Questions
@@ -324,12 +386,12 @@ class InheritedAttributeSample
 
 ## Continuous Integration
 
-The project is continuously tested by [GitHub actions](https://github.com/olvlvl/composer-attribute-collector/actions).
+The project is continuously tested by [GitHub actions](https://github.com/ekwi-tech/composer-attribute-collector/actions).
 
-[![Cases](https://github.com/olvlvl/composer-attribute-collector/actions/workflows/cases.yml/badge.svg?branch=main)](https://github.com/olvlvl/composer-attribute-collector/actions/workflows/cases.yml)
-[![Tests](https://github.com/olvlvl/composer-attribute-collector/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/olvlvl/composer-attribute-collector/actions/workflows/test.yml)
-[![Static Analysis](https://github.com/olvlvl/composer-attribute-collector/actions/workflows/quality.yml/badge.svg?job=phpstan)](https://github.com/olvlvl/composer-attribute-collector/actions/workflows/quality.yml)
-[![Code Style](https://github.com/olvlvl/composer-attribute-collector/actions/workflows/quality.yml/badge.svg?job=phpcs)](https://github.com/olvlvl/composer-attribute-collector/actions/workflows/quality.yml)
+[![Cases](https://github.com/ekwi-tech/composer-attribute-collector/actions/workflows/cases.yml/badge.svg?branch=main)](https://github.com/ekwi-tech/composer-attribute-collector/actions/workflows/cases.yml)
+[![Tests](https://github.com/ekwi-tech/composer-attribute-collector/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/ekwi-tech/composer-attribute-collector/actions/workflows/test.yml)
+[![Static Analysis](https://github.com/ekwi-tech/composer-attribute-collector/actions/workflows/quality.yml/badge.svg?job=phpstan)](https://github.com/ekwi-tech/composer-attribute-collector/actions/workflows/quality.yml)
+[![Code Style](https://github.com/ekwi-tech/composer-attribute-collector/actions/workflows/quality.yml/badge.svg?job=phpcs)](https://github.com/ekwi-tech/composer-attribute-collector/actions/workflows/quality.yml)
 
 
 
@@ -342,11 +404,25 @@ this project and its community, you're expected to uphold this code.
 
 ## Contributing
 
-See [CONTRIBUTING](CONTRIBUTING.md) for details.
+See [CONTRIBUTING](CONTRIBUTING.md) for details. Issues and pull requests belong to
+[this repository](https://github.com/ekwi-tech/composer-attribute-collector); please don't open
+them against [upstream][] for changes that are specific to the fork.
+
+
+
+## Acknowledgements
+
+This project is a fork of [olvlvl/composer-attribute-collector][upstream] by
+[Olivier Laviale][olvlvl]. The design, the implementation, and most of the code and documentation
+you are reading are theirs, and the [BSD-3-Clause license](LICENSE) and copyright of the original
+work are unchanged. Thank you for the plugin, and for making it free software.
 
 
 
 [Composer]:  https://getcomposer.org/
+[upstream]:  https://github.com/olvlvl/composer-attribute-collector
+[olvlvl]:    https://github.com/olvlvl
+[packagist.org]: https://packagist.org/
 [root-only]: https://getcomposer.org/doc/04-schema.md#root-package
 [spatie/file-system-watcher]: https://github.com/spatie/file-system-watcher
 [phpstorm-watchers]: https://www.jetbrains.com/help/phpstorm/using-file-watchers.html
