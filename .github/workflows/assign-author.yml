@@ -1,0 +1,19 @@
+name: Assign the author
+
+# Internal process: the author belongs in the assignees, on issues and pull requests alike.
+on:
+  issues:
+    types: [opened]
+  pull_request:
+    types: [opened]
+
+permissions: {}
+
+jobs:
+  assign:
+    # Workflows are never inherited from the organization's `.github` repository: every repository
+    # carries this caller and grants the scope it needs.
+    uses: ekwi-tech/.github/.github/workflows/assign-author.yml@02d7ad7396cd0d8c8a729ea1f70472eac7925f53
+    permissions:
+      issues: write
+      pull-requests: write
