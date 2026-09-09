@@ -118,3 +118,35 @@ Each case is a standalone app pinning the plugin via a `path` repository. `make 
 `src/`, `composer.json`, and `collector.php` into `cases/<name>/composer-attribute-collector/` —
 required before `composer install` there. CI runs all three (incompatible-signature, symfony,
 laravel) against PHP 8.0–8.5, so avoid syntax in the *generated* output that older PHP can't parse.
+
+## Conventions
+
+- Everything committed is English: code comments, PHPDoc, commit messages, branch names, PR titles
+  and bodies. Issues are the exception — they are written in French.
+- Comments are short — the WHY, not the HOW. A long comment is not more rigorous, only less read.
+
+## Git
+
+- **Never commit, push, or open a PR without an explicit go** from the user. A go authorizes that
+  one act, not the next one, and an instruction to make a change is not authorization to commit it:
+  prepare the branch, the diff and the message, then stop.
+- Commit and PR titles follow conventional commits, since a squashed PR title becomes the commit
+  title on `main`. A body, when there is one, is two to four structured lines: no bug narrative, no
+  test report, no restatement of the history git already holds.
+- Never append a tool attribution footer, or a `Co-Authored-By` trailer naming a tool, to a commit,
+  a PR body or an issue. A PR body ends on its last substantive line.
+- No `--assignee` is needed: the `assign-author` workflow assigns the author of every issue and
+  pull request.
+
+## Review before committing
+
+Review before every commit, and again past roughly 250 lines of accumulated diff — not at the end
+of the task. Delegate it to a **read-only** subagent on a reasoning-heavy model — Opus at minimum,
+or Fable, never a smaller tier — and say the read-only constraint in its prompt: no `git add /
+checkout / restore / stash / reset / clean / commit / push / merge`, no file write, no
+outward-facing action. Verify its findings before acting on them; it is sometimes wrong.
+
+The method and that agent are carried by a shared plugin, which a repository cannot declare for you.
+Each person installs it once: `claude plugin marketplace add ekwi-tech/ekwi-agent-kit`, then
+`claude plugin install ekwi@ekwi-tech`. Say so when it is missing — the review still happens, it is
+just quietly weaker, and nobody notices a weaker review.
