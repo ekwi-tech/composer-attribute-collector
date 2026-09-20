@@ -149,11 +149,14 @@ laravel) against PHP 8.0–8.5, so avoid syntax in the *generated* output that o
 
 ## Review before committing
 
-Review before every commit, and again past roughly 250 lines of accumulated diff — not at the end
-of the task. Delegate it to a **read-only** subagent on a reasoning-heavy model — Opus at minimum,
-or Fable, never a smaller tier — and say the read-only constraint in its prompt: no `git add /
-checkout / restore / stash / reset / clean / commit / push / merge`, no file write, no
-outward-facing action. Verify its findings before acting on them; it is sometimes wrong.
+Review before every commit, whatever the diff size — that one fires by itself, no permission asked.
+Past roughly 250 lines of accumulated diff, announce the review rather than launch it as soon as the
+threshold is crossed — not at the end of the task — and let the author pick the moment: fired
+mid-thought, a review reports against code that was about to change anyway. Delegate it to a
+**read-only** subagent on a reasoning-heavy model — Opus at minimum, or Fable, never a smaller
+tier — and say the read-only constraint in its prompt: no `git add / checkout / restore / stash /
+reset / clean / commit / push / merge`, no file write, no outward-facing action. Verify its findings
+before acting on them; it is sometimes wrong.
 
 The method and that agent are carried by a shared plugin, which a repository cannot declare for you.
 Each person installs it once: `claude plugin marketplace add ekwi-tech/ekwi-agent-kit`, then
