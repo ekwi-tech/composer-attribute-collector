@@ -73,6 +73,11 @@ Two runtimes, deliberately separated:
 (hand-rolled export into the PHP file: short arrays, no numeric keys on lists, `var_export` used
 only to quote individual strings).
 
+- `IncludePath::unscannableReason()` rejects, before the scan, a path that `ClassMapGenerator` would throw
+  on — one that is neither a file nor a directory, or a wildcard matching no *directory* (Finder resolves it
+  with `GLOB_ONLYDIR`, so `src/*.php` is unscannable). That prediction duplicates a contract owned by
+  `composer/class-map-generator` and `symfony/finder`, which is not even declared here; `IncludePathTest`
+  pins it against the real generator and fails the day either stops agreeing.
 - `ContentFilter` reads the file as **plain text**: no `#[` means skip, and a file that looks like
   it declares an attribute class is skipped. This is why a class inheriting attributes from a trait
   needs `#[InheritsAttributes]` to be seen at all.
