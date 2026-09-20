@@ -34,7 +34,7 @@ make                   # list every target
 make test              # composer install + clean sandboxes + phpunit
 make test-filter FILTER=testTargetMethods
 make test-coverage     # HTML coverage in build/coverage
-make lint              # phpcs -s (PSR-12) + phpstan level max on src/
+make lint              # phpcs -s (PSR-12) + phpstan level max on src/ and tests/
 make shell             # interactive shell in the image
 make test PHP_VERSION=8.5
 ```

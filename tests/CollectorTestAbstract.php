@@ -78,10 +78,6 @@ abstract class CollectorTestAbstract extends TestCase
             "$cwd/tests/Acme/PSR4/IncompatibleSignature.php",
         ];
 
-        if (\PHP_VERSION_ID < 80100) {
-            $exclude[] = "$cwd/tests/Acme81";
-        }
-
         return new Config(
             vendorDir: $vendorDir,
             attributesFile: $filepath,
@@ -163,7 +159,7 @@ abstract class CollectorTestAbstract extends TestCase
     }
 
     /**
-     * @return array<array{ class-string, array<array{ class-string, callable-string }> }>
+     * @return array<array{ class-string, array<array{ class-string, non-empty-string }> }>
      */
     public static function provideTargetMethods(): array
     {
@@ -227,7 +223,7 @@ abstract class CollectorTestAbstract extends TestCase
     }
 
     /**
-     * @return array<array{ class-string, array<array{ class-string, callable-string }> }>
+     * @return array<array{ class-string, array<array{ class-string, non-empty-string }> }>
      */
     public static function provideTargetParameters(): array
     {
