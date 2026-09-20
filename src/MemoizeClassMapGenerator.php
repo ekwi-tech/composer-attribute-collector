@@ -6,15 +6,6 @@ use Composer\ClassMapGenerator\ClassMapGenerator;
 use DirectoryIterator;
 use RuntimeException;
 
-use function array_filter;
-use function array_merge;
-use function filemtime;
-use function is_dir;
-use function is_int;
-use function time;
-
-use const ARRAY_FILTER_USE_KEY;
-
 /**
  * @internal
  */
@@ -52,10 +43,10 @@ class MemoizeClassMapGenerator
         /**
          * Paths might have been removed, we need to filter according to the paths provided during {@link scanPaths()}
          */
-        $this->state = array_filter(
+        $this->state = \array_filter(
             $this->state,
             fn(string $k): bool => $this->paths[$k] ?? false,
-            ARRAY_FILTER_USE_KEY
+            \ARRAY_FILTER_USE_KEY
         );
 
         $this->datastore->set(self::KEY, $this->state);
@@ -66,7 +57,7 @@ class MemoizeClassMapGenerator
             $maps[] = $map;
         }
 
-        return array_merge(...$maps);
+        return \array_merge(...$maps);
     }
 
     /**
@@ -90,7 +81,7 @@ class MemoizeClassMapGenerator
             $inner->scanPaths($path, $excluded);
             $map = $inner->getClassMap()->getMap();
 
-            $this->state[$path] = [ time(), $map ];
+            $this->state[$path] = [ \time(), $map ];
         }
     }
 
@@ -100,9 +91,9 @@ class MemoizeClassMapGenerator
             return true;
         }
 
-        $mtime = filemtime($path);
+        $mtime = \filemtime($path);
 
-        assert(is_int($mtime));
+        \assert(\is_int($mtime));
 
         if ($timestamp < $mtime) {
             $diff = $mtime - $timestamp;
@@ -112,7 +103,7 @@ class MemoizeClassMapGenerator
         }
 
         // Could be a file referenced as a class map, we don't want to iterate over that.
-        if (!is_dir($path)) {
+        if (!\is_dir($path)) {
             return false;
         }
 

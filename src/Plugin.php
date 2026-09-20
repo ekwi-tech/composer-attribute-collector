@@ -9,15 +9,6 @@ use Composer\Plugin\PluginInterface;
 use Composer\Script\Event;
 use Symfony\Component\Process\Process;
 
-use function file_exists;
-use function file_put_contents;
-use function microtime;
-use function sys_get_temp_dir;
-use function tempnam;
-use function unlink;
-
-use const DIRECTORY_SEPARATOR;
-
 /**
  * @internal
  */
@@ -45,9 +36,9 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
     public function activate(Composer $composer, IOInterface $io): void
     {
         $vendorDir = Config::resolveVendorDir($composer);
-        $filename = $vendorDir . DIRECTORY_SEPARATOR . "attributes.php";
+        $filename = $vendorDir . \DIRECTORY_SEPARATOR . "attributes.php";
 
-        if (file_exists($filename)) {
+        if (\file_exists($filename)) {
             return;
         }
 
@@ -59,7 +50,7 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
 
         PHP;
 
-        file_put_contents($filename, $stub);
+        \file_put_contents($filename, $stub);
     }
 
     /**
@@ -85,7 +76,7 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
         require_once $config->vendorDir . "/autoload.php";
 
         $io->write('<info>Generating attributes file</info>');
-        $start = microtime(true);
+        $start = \microtime(true);
         self::dump($config);
         $elapsed = ElapsedTime::render($start);
         $io->write("<info>Generated attributes file in $elapsed</info>");
@@ -94,11 +85,11 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
     public static function dump(Config $config): void
     {
         $collector = __DIR__ . '/../collector.php';
-        $tmpFile = tempnam(sys_get_temp_dir(), 'composer-attribute-collector-');
+        $tmpFile = \tempnam(\sys_get_temp_dir(), 'composer-attribute-collector-');
         if ($tmpFile === false) {
             throw new \RuntimeException('Unable to create temporary file');
         }
-        file_put_contents($tmpFile, serialize($config));
+        \file_put_contents($tmpFile, \serialize($config));
 
         try {
             $process = new Process([ "/usr/bin/env", "php", $collector, $tmpFile ]);
@@ -106,7 +97,7 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
                 print($line);
             });
         } finally {
-            unlink($tmpFile);
+            \unlink($tmpFile);
         }
     }
 }

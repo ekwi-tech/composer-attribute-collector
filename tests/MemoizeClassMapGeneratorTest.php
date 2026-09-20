@@ -6,12 +6,6 @@ use Ekwi\ComposerAttributeCollector\Datastore\FileDatastore;
 use Ekwi\ComposerAttributeCollector\MemoizeClassMapGenerator;
 use PHPUnit\Framework\TestCase;
 
-use function file_exists;
-use function file_put_contents;
-use function time;
-use function touch;
-use function unlink;
-
 final class MemoizeClassMapGeneratorTest extends TestCase
 {
     private const DIR = __DIR__ . '/sandbox-memoize-classmap/';
@@ -26,8 +20,8 @@ final class MemoizeClassMapGeneratorTest extends TestCase
         ];
 
         foreach ($remove as $filename) {
-            if (file_exists($filename)) {
-                unlink($filename);
+            if (\file_exists($filename)) {
+                \unlink($filename);
             }
         }
     }
@@ -85,11 +79,11 @@ final class MemoizeClassMapGeneratorTest extends TestCase
 
     private static function write(string $name, string $data): void
     {
-        file_put_contents(self::DIR . $name, $data);
+        \file_put_contents(self::DIR . $name, $data);
 
         // Because the modified time granularity is a second, we need the set the time to the next second,
         // so that we don't have to use sleep().
-        touch(self::DIR, time() + 1);
+        \touch(self::DIR, \time() + 1);
     }
 
     /**

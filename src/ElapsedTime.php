@@ -13,6 +13,6 @@ final class ElapsedTime
      */
     public static function render(float $start): string
     {
-        return sprintf("%.03f ms", (microtime(true) - $start) * 1000);
+        return \sprintf("%.03f ms", (\microtime(true) - $start) * 1000);
     }
 }

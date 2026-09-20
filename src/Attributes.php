@@ -5,8 +5,6 @@ namespace Ekwi\ComposerAttributeCollector;
 use Closure;
 use LogicException;
 
-use function is_a;
-
 final class Attributes
 {
     /**
@@ -120,7 +118,7 @@ final class Attributes
      */
     public static function predicateForAttributeInstanceOf(string $class): Closure
     {
-        return fn(string $attribute): bool => is_a($attribute, $class, true);
+        return fn(string $attribute): bool => \is_a($attribute, $class, true);
     }
 
     /**

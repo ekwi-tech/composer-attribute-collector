@@ -4,13 +4,6 @@ namespace Ekwi\ComposerAttributeCollector;
 
 use Closure;
 
-use function array_filter;
-use function filemtime;
-use function is_int;
-use function time;
-
-use const ARRAY_FILTER_USE_KEY;
-
 /**
  * @internal
  */
@@ -47,9 +40,9 @@ class MemoizeClassMapFilter
             $paths[$pathname] = true;
             [ $timestamp, $keep ] = $this->state[$pathname] ?? [ 0, false ];
 
-            $mtime = filemtime($pathname);
+            $mtime = \filemtime($pathname);
 
-            assert(is_int($mtime));
+            \assert(\is_int($mtime));
 
             if ($timestamp < $mtime) {
                 if ($timestamp) {
@@ -60,7 +53,7 @@ class MemoizeClassMapFilter
                 }
 
                 $keep = $filter($class, $pathname);
-                $this->state[$pathname] = [ time(), $keep ];
+                $this->state[$pathname] = [ \time(), $keep ];
             }
 
             if ($keep) {
@@ -71,10 +64,10 @@ class MemoizeClassMapFilter
         /**
          * Paths might have been removed, we need to filter entries according to the paths found.
          */
-        $this->state = array_filter(
+        $this->state = \array_filter(
             $this->state,
             static fn(string $k): bool => $paths[$k] ?? false,
-            ARRAY_FILTER_USE_KEY
+            \ARRAY_FILTER_USE_KEY
         );
 
         $this->datastore->set(self::KEY, $this->state);

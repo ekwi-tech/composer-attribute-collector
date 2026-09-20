@@ -2,11 +2,6 @@
 
 namespace Ekwi\ComposerAttributeCollector;
 
-use function array_map;
-use function implode;
-use function is_array;
-use function var_export;
-
 /**
  * Renders collected attribute targets as PHP code.
  *
@@ -77,10 +72,10 @@ final class TransientCollectionRenderer
      */
     private static function exportTarget(string|array $target): string
     {
-        if (is_array($target)) {
-            $exported = array_map(fn(string $v): string => self::exportString($v), $target);
+        if (\is_array($target)) {
+            $exported = \array_map(fn(string $v): string => self::exportString($v), $target);
 
-            return '[ ' . implode(', ', $exported) . ' ]';
+            return '[ ' . \implode(', ', $exported) . ' ]';
         }
 
         return self::exportString($target);
@@ -88,7 +83,7 @@ final class TransientCollectionRenderer
 
     private static function exportString(string $value): string
     {
-        return var_export($value, true);
+        return \var_export($value, true);
     }
 
     /**
