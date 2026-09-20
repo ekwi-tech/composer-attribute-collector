@@ -144,7 +144,7 @@ final class CollectorIncludeTest extends TestCase
     private static function cwd(): string
     {
         $cwd = \getcwd();
-        \assert(\is_string($cwd) && $cwd !== '');
+        \assert(\is_string($cwd));
 
         return $cwd;
     }

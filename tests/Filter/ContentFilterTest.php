@@ -17,6 +17,10 @@ use PHPUnit\Framework\TestCase;
 final class ContentFilterTest extends TestCase
 {
     private ContentFilter $sut;
+
+    /**
+     * @var Logger&MockObjectAlias
+     */
     private MockObjectAlias|Logger $log;
 
     protected function setUp(): void
@@ -24,7 +28,7 @@ final class ContentFilterTest extends TestCase
         parent::setUp();
 
         $this->sut = new ContentFilter();
-        $this->log = $this->getMockBuilder(Logger::class)->getMock();
+        $this->log = $this->createMock(Logger::class);
     }
 
     /**
@@ -45,6 +49,9 @@ final class ContentFilterTest extends TestCase
         $this->assertFalse($actual);
     }
 
+    /**
+     * @return array<array{ string }>
+     */
     public function provideAttribute(): array
     {
         return [
@@ -75,6 +82,9 @@ final class ContentFilterTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
+    /**
+     * @return array<array{ string }>
+     */
     public function provideClass(): array
     {
         return [

@@ -1,7 +1,35 @@
 # $schema: https://phpstan.olvlvl.com/schema.json
+includes:
+  - vendor/phpstan/phpstan-phpunit/extension.neon
 parameters:
   bootstrapFiles:
     - tests/bootstrap.php
   level: max
   paths:
     - src
+    - tests
+  excludePaths:
+    # Fixtures stand in for third-party code: they are input to the collector, not code we maintain, and some
+    # are deliberately unloadable.
+    - tests/Acme
+    - tests/Acme81
+    - tests/Filter/ContentFilterCases
+    - tests/sandbox
+    - tests/sandbox-memoize-classmap
+  ignoreErrors:
+    # These tests pass a name that stands in for a class and is never loaded—the filters only log it.
+    -
+      identifier: argument.type
+      message: '#expects class-string, string given#'
+      paths:
+        - tests/Filter/ChainTest.php
+        - tests/Filter/ContentFilterTest.php
+    # The generic `Target*` annotations let PHPStan prove the instance type, but proving it is the point of
+    # the test: `AttributeInstantiator` builds that instance by reflection at run time.
+    -
+      identifier: method.alreadyNarrowedType
+      path: tests/TargetTest.php
+    # Kept as the specification of a capability the datastore does not have yet; the test is skipped.
+    -
+      identifier: deadCode.unreachable
+      path: tests/FileDatastoreTest.php

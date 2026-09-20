@@ -36,7 +36,7 @@ final class Collector
         $classMapGenerator = new MemoizeClassMapGenerator($datastore, $log);
         $skipped = 0;
         foreach ($config->include as $include) {
-            $reason = self::unscannableReason($include);
+            $reason = IncludePath::unscannableReason($include);
 
             if ($reason !== null) {
                 $log->warning("Generating attributes file: skipping include path '$include', $reason");
@@ -90,31 +90,6 @@ final class Collector
         \file_put_contents($config->attributesFile, $code);
         $elapsed = ElapsedTime::render($start);
         $log->debug("Generating attributes file: rendered code in $elapsed");
-    }
-
-    /**
-     * An include path that resolves to nothing is fatal further down: the class map generator throws on a path
-     * that is neither a file nor a directory, and hands a wildcard path to Symfony's Finder, which throws when
-     * the pattern matches no *directory*—a wildcard matching only files, such as `src/*.php`, has never been
-     * scannable.
-     *
-     * @return string|null
-     *     Why the path cannot be scanned, or `null` when it can.
-     */
-    private static function unscannableReason(string $path): ?string
-    {
-        if (\is_file($path) || \is_dir($path)) {
-            return null;
-        }
-
-        if (!\str_contains($path, '*')) {
-            return 'it is neither a file nor a directory';
-        }
-
-        // The flags are those Finder uses to resolve the pattern.
-        $flags = (\defined('GLOB_BRACE') ? \GLOB_BRACE : 0) | \GLOB_ONLYDIR | \GLOB_NOSORT;
-
-        return \glob($path, $flags) ? null : 'it matches no directory';
     }
 
     private function buildDefaultDatastore(): Datastore

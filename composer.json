@@ -47,6 +47,7 @@
   "require-dev": {
     "composer/composer": ">=2.3",
     "phpstan/phpstan": "^2.1.17",
+    "phpstan/phpstan-phpunit": "^2.0",
     "phpunit/phpunit": "^9.6.23"
   },
   "extra": {
