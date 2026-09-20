@@ -82,7 +82,7 @@ class ClassAttributeCollector
                 }
 
                 $property = $propertyReflection->name;
-                assert($property !== '');
+                \assert($property !== '');
 
                 $this->log->debug("Found attribute {$attribute->getName()} on $class::$property");
 
@@ -169,7 +169,7 @@ class ClassAttributeCollector
             );
         }
 
-        $parameterAttributes = array_merge(
+        $parameterAttributes = \array_merge(
             $parameterAttributes,
             $this->collectParameterAttributes($methodReflection),
         );

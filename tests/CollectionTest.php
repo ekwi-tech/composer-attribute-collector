@@ -25,8 +25,6 @@ use Ekwi\ComposerAttributeCollector\TargetParameter;
 use Ekwi\ComposerAttributeCollector\TargetProperty;
 use PHPUnit\Framework\TestCase;
 
-use function in_array;
-
 final class CollectionTest extends TestCase
 {
     public function testFindTargetClasses(): void
@@ -143,7 +141,7 @@ final class CollectionTest extends TestCase
         );
 
         $actual = $collection->filterTargetClasses(
-            fn($a, $c) => in_array($c, [ ArticleController::class, ImageController::class ])
+            fn($a, $c) => \in_array($c, [ ArticleController::class, ImageController::class ])
         );
 
         $this->assertEquals([
@@ -174,7 +172,7 @@ final class CollectionTest extends TestCase
             ]
         );
 
-        $actual = $collection->filterTargetMethods(fn($a) => is_a($a, Route::class, true));
+        $actual = $collection->filterTargetMethods(fn($a) => \is_a($a, Route::class, true));
 
         $this->assertEquals([
             new TargetMethod(Route::class, ArticleController::class, 'recent'),
@@ -204,7 +202,7 @@ final class CollectionTest extends TestCase
             ]
         );
 
-        $actual = $collection->filterTargetParameters(fn($a) => is_a($a, ParameterA::class, true));
+        $actual = $collection->filterTargetParameters(fn($a) => \is_a($a, ParameterA::class, true));
 
         $this->assertEquals([
             new TargetParameter(ParameterA::class, ArticleController::class, 'myMethod', 'myParamA'),

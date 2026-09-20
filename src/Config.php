@@ -9,19 +9,6 @@ use Composer\Util\Platform;
 use InvalidArgumentException;
 use RuntimeException;
 
-use function array_map;
-use function dirname;
-use function filter_var;
-use function implode;
-use function is_string;
-use function preg_quote;
-use function realpath;
-use function str_ends_with;
-use function str_starts_with;
-use function strlen;
-
-use const DIRECTORY_SEPARATOR;
-
 /**
  * @readonly
  * @internal
@@ -43,14 +30,14 @@ final class Config
     {
         $vendorDir = self::resolveVendorDir($composer);
         $composerFile = Factory::getComposerFile();
-        $rootDir = realpath(dirname($composerFile));
+        $rootDir = \realpath(\dirname($composerFile));
 
         if (!$rootDir) {
             throw new RuntimeException("Unable to determine root directory");
         }
 
-        $rootDir .= DIRECTORY_SEPARATOR;
-        $attributesFile = $vendorDir . DIRECTORY_SEPARATOR . self::FILENAME;
+        $rootDir .= \DIRECTORY_SEPARATOR;
+        $attributesFile = $vendorDir . \DIRECTORY_SEPARATOR . self::FILENAME;
 
         $package = $composer->getPackage();
         /** @var array{ include?: non-empty-string[], exclude?: non-empty-string[] } $extra */
@@ -63,7 +50,7 @@ final class Config
         );
         $exclude = self::expandPaths($extra[self::EXTRA_EXCLUDE] ?? [], $vendorDir, $rootDir);
 
-        $useCache = filter_var(Platform::getEnv(self::ENV_USE_CACHE), FILTER_VALIDATE_BOOL);
+        $useCache = \filter_var(Platform::getEnv(self::ENV_USE_CACHE), \FILTER_VALIDATE_BOOL);
 
         return new self(
             $vendorDir,
@@ -82,7 +69,7 @@ final class Config
     {
         $vendorDir = $composer->getConfig()->get('vendor-dir');
 
-        if (!is_string($vendorDir) || !$vendorDir) {
+        if (!\is_string($vendorDir) || !$vendorDir) {
             throw new RuntimeException("Unable to determine vendor directory");
         }
 
@@ -101,7 +88,7 @@ final class Config
         foreach ($package->getAutoload() as $paths) {
             /** @var non-empty-string[] $paths */
             foreach ($paths as $path) {
-                if (realpath($path) === $attributesFile) {
+                if (\realpath($path) === $attributesFile) {
                     continue;
                 }
 
@@ -138,7 +125,7 @@ final class Config
         public bool $useCache,
         public bool $isDebug,
     ) {
-        $this->excludeRegExp = count($exclude) ? self::compileExclude($this->exclude) : null;
+        $this->excludeRegExp = \count($exclude) ? self::compileExclude($this->exclude) : null;
     }
 
     /**
@@ -148,7 +135,7 @@ final class Config
      */
     private static function compileExclude(array $exclude): string
     {
-        $regexp = implode('|', array_map(fn (string $path) => preg_quote($path), $exclude));
+        $regexp = \implode('|', \array_map(fn (string $path) => \preg_quote($path), $exclude));
 
         return "($regexp)";
     }
@@ -162,23 +149,23 @@ final class Config
      */
     private static function expandPaths(array $paths, string $vendorDir, string $rootDir): array
     {
-        if (str_ends_with($vendorDir, DIRECTORY_SEPARATOR)) {
+        if (\str_ends_with($vendorDir, \DIRECTORY_SEPARATOR)) {
             throw new InvalidArgumentException("vendorDir must not end with a directory separator, given: $vendorDir");
         }
 
-        if (!str_ends_with($rootDir, DIRECTORY_SEPARATOR)) {
+        if (!\str_ends_with($rootDir, \DIRECTORY_SEPARATOR)) {
             throw new InvalidArgumentException("rootDir must end with a directory separator, given: $rootDir");
         }
 
         $expanded = [];
 
         foreach ($paths as $path) {
-            if (str_starts_with($path, "./")) {
-                $path = substr($path, 2);
+            if (\str_starts_with($path, "./")) {
+                $path = \substr($path, 2);
             }
 
-            if (str_starts_with($path, self::VENDOR_PLACEHOLDER)) {
-                $path = $vendorDir . substr($path, strlen(self::VENDOR_PLACEHOLDER));
+            if (\str_starts_with($path, self::VENDOR_PLACEHOLDER)) {
+                $path = $vendorDir . \substr($path, \strlen(self::VENDOR_PLACEHOLDER));
             } else {
                 $path = $rootDir . $path;
             }

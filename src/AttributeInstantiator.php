@@ -27,7 +27,7 @@ final class AttributeInstantiator
      */
     public static function instantiate(array $attributes, string $attribute, string $target): object
     {
-        $reflection = reset($attributes)
+        $reflection = \reset($attributes)
             ?: throw new LogicException(
                 "Unable to find the attribute $attribute on $target,"
                 . " the attributes file might be out of date."

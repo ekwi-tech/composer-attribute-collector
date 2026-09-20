@@ -292,6 +292,14 @@ replaced with the path to the vendor folder.
 }
 ```
 
+A path that cannot be resolved is skipped with a warning, rather than aborting the autoload
+dump—an include path may legitimately be absent from one install context and present in another.
+Watch for that warning if a class is never indexed: it usually means a misspelled path. Skipping
+every include path is still fatal, so that an empty `attributes.php` is never written over a good
+one.
+
+A wildcard path must match a **directory**: `{vendor}/acme/*/src` is scanned, `src/*.php` is not.
+
 ### Excluding paths or files ([root-only][])
 
 Use the `exclude` property to exclude paths or files from scanning. This is handy when files

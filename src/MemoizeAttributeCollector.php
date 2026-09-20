@@ -4,11 +4,6 @@ namespace Ekwi\ComposerAttributeCollector;
 
 use Throwable;
 
-use function array_filter;
-use function filemtime;
-
-use const ARRAY_FILTER_USE_KEY;
-
 /**
  * @internal
  */
@@ -59,7 +54,7 @@ class MemoizeAttributeCollector
                 $parameterAttributes,
             ] = $this->state[$class] ?? [ 0, [], [], [], [] ];
 
-            $mtime = filemtime($filepath);
+            $mtime = \filemtime($filepath);
 
             if ($timestamp < $mtime) {
                 if ($timestamp) {
@@ -83,7 +78,7 @@ class MemoizeAttributeCollector
                 }
 
                 $this->state[$class] = [
-                    time(),
+                    \time(),
                     $classAttributes,
                     $methodAttributes,
                     $propertyAttributes,
@@ -91,16 +86,16 @@ class MemoizeAttributeCollector
                 ];
             }
 
-            if (count($classAttributes)) {
+            if (\count($classAttributes)) {
                 $collector->addClassAttributes($class, $classAttributes);
             }
-            if (count($methodAttributes)) {
+            if (\count($methodAttributes)) {
                 $collector->addMethodAttributes($class, $methodAttributes);
             }
-            if (count($parameterAttributes)) {
+            if (\count($parameterAttributes)) {
                 $collector->addParameterAttributes($class, $parameterAttributes);
             }
-            if (count($propertyAttributes)) {
+            if (\count($propertyAttributes)) {
                 $collector->addTargetProperties($class, $propertyAttributes);
             }
         }
@@ -108,10 +103,10 @@ class MemoizeAttributeCollector
         /**
          * Classes might have been removed, we need to filter entries according to the classes found.
          */
-        $this->state = array_filter(
+        $this->state = \array_filter(
             $this->state,
             static fn(string $k): bool => $filterClasses[$k] ?? false,
-            ARRAY_FILTER_USE_KEY,
+            \ARRAY_FILTER_USE_KEY,
         );
 
         $this->datastore->set(self::KEY, $this->state);

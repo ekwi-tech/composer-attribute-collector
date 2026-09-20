@@ -10,7 +10,7 @@ final class ComposerLoggerTest extends TestCase
 {
     public function testDebug(): void
     {
-        $message = uniqid();
+        $message = \uniqid();
         $io = $this->createMock(IOInterface::class);
         $io->expects(self::once())->method('debug')->with($message);
 
@@ -20,7 +20,7 @@ final class ComposerLoggerTest extends TestCase
 
     public function testWarning(): void
     {
-        $message = uniqid();
+        $message = \uniqid();
         $io = $this->createMock(IOInterface::class);
         $io->expects(self::once())->method('warning')->with($message);
 
@@ -30,7 +30,7 @@ final class ComposerLoggerTest extends TestCase
 
     public function testError(): void
     {
-        $message = uniqid();
+        $message = \uniqid();
         $io = $this->createMock(IOInterface::class);
         $io->expects(self::once())->method('error')->with($message);
 

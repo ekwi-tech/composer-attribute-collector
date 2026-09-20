@@ -8,8 +8,6 @@ use Ekwi\ComposerAttributeCollector\Plugin;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-use function file_put_contents;
-
 final class FileDatastoreTest extends TestCase
 {
     private const DIR = __DIR__ . '/sandbox/';
@@ -83,6 +81,6 @@ final class FileDatastoreTest extends TestCase
     {
         $filename = self::DIR . 'v' . Plugin::VERSION_MAJOR . '-' . Plugin::VERSION_MINOR . '-' . self::KEY;
 
-        file_put_contents($filename, $str);
+        \file_put_contents($filename, $str);
     }
 }

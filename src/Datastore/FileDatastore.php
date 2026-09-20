@@ -6,19 +6,6 @@ use Ekwi\ComposerAttributeCollector\Datastore;
 use Ekwi\ComposerAttributeCollector\Logger;
 use Ekwi\ComposerAttributeCollector\Plugin;
 
-use function file_exists;
-use function file_get_contents;
-use function file_put_contents;
-use function is_array;
-use function is_dir;
-use function mkdir;
-use function restore_error_handler;
-use function serialize;
-use function set_error_handler;
-use function unserialize;
-
-use const DIRECTORY_SEPARATOR;
-
 /**
  * @internal
  */
@@ -31,8 +18,8 @@ final class FileDatastore implements Datastore
         private string $dir,
         private Logger $log,
     ) {
-        if (!is_dir($dir)) {
-            mkdir($dir);
+        if (!\is_dir($dir)) {
+            \mkdir($dir);
         }
     }
 
@@ -40,7 +27,7 @@ final class FileDatastore implements Datastore
     {
         $filename = $this->formatFilename($key);
 
-        if (!file_exists($filename)) {
+        if (!\file_exists($filename)) {
             return [];
         }
 
@@ -51,7 +38,7 @@ final class FileDatastore implements Datastore
     {
         $filename = $this->formatFilename($key);
 
-        file_put_contents($filename, serialize($data));
+        \file_put_contents($filename, \serialize($data));
     }
 
     /**
@@ -59,7 +46,7 @@ final class FileDatastore implements Datastore
      */
     private function safeGet(string $filename): array
     {
-        $str = file_get_contents($filename);
+        $str = \file_get_contents($filename);
 
         if ($str === false) {
             return [];
@@ -67,7 +54,7 @@ final class FileDatastore implements Datastore
 
         $errored = false;
 
-        set_error_handler(function (int $errno, string $errstr) use (&$errored, $filename): bool {
+        \set_error_handler(function (int $errno, string $errstr) use (&$errored, $filename): bool {
             $errored = true;
 
             $this->log->warning("Unable to unserialize cache item $filename: $errstr");
@@ -75,11 +62,11 @@ final class FileDatastore implements Datastore
             return true;
         });
 
-        $ar = unserialize($str);
+        $ar = \unserialize($str);
 
-        restore_error_handler();
+        \restore_error_handler();
 
-        if ($errored || !is_array($ar)) {
+        if ($errored || !\is_array($ar)) {
             return [];
         }
 
@@ -91,6 +78,6 @@ final class FileDatastore implements Datastore
         $major = Plugin::VERSION_MAJOR;
         $minor = Plugin::VERSION_MINOR;
 
-        return $this->dir . DIRECTORY_SEPARATOR . "v$major-$minor-$key";
+        return $this->dir . \DIRECTORY_SEPARATOR . "v$major-$minor-$key";
     }
 }

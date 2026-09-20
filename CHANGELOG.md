@@ -25,7 +25,14 @@ None
 
 ### Other Changes
 
-None
+An include path that cannot be resolved is now skipped, with a warning, instead of aborting the
+autoload dump. This covers a literal path that is neither a file nor a directory, and a wildcard
+pattern matching no directory. A path that legitimately exists in one install context and not
+another—a Docker build stage, an install from a dist archive—no longer breaks `composer install`.
+
+Skipping *every* include path remains fatal: rendering would overwrite a possibly good
+`attributes.php` with an empty one, trading a build failure for an application that finds no
+attribute at run time with nothing in the logs to say why.
 
 
 ## 3.0.0

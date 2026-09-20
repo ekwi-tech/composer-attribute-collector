@@ -2,8 +2,6 @@
 
 namespace Ekwi\ComposerAttributeCollector;
 
-use function array_map;
-
 /**
  * @internal
  */
@@ -39,7 +37,7 @@ final class Collection
      */
     public function findTargetClasses(string $attribute): array
     {
-        return array_map(
+        return \array_map(
             fn(string $class) => new TargetClass($attribute, $class),
             $this->targetClasses[$attribute] ?? [],
         );
@@ -54,7 +52,7 @@ final class Collection
      */
     public function findTargetMethods(string $attribute): array
     {
-        return array_map(
+        return \array_map(
             fn(array $t) => new TargetMethod($attribute, ...$t),
             $this->targetMethods[$attribute] ?? [],
         );
@@ -69,7 +67,7 @@ final class Collection
      */
     public function findTargetParameters(string $attribute): array
     {
-        return array_map(
+        return \array_map(
             fn(array $t) => new TargetParameter($attribute, ...$t),
             $this->targetParameters[$attribute] ?? [],
         );
@@ -84,7 +82,7 @@ final class Collection
      */
     public function findTargetProperties(string $attribute): array
     {
-        return array_map(
+        return \array_map(
             fn(array $t) => new TargetProperty($attribute, ...$t),
             $this->targetProperties[$attribute] ?? [],
         );

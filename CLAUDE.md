@@ -124,6 +124,10 @@ laravel) against PHP 8.0–8.5, so avoid syntax in the *generated* output that o
 - Everything committed is English: code comments, PHPDoc, commit messages, branch names, PR titles
   and bodies. Issues are the exception — they are written in French.
 - Comments are short — the WHY, not the HOW. A long comment is not more rigorous, only less read.
+- PHP's own functions and constants are called fully qualified — `\is_file($path)`,
+  `\DIRECTORY_SEPARATOR` — never imported with `use function` or `use const`. No sniff enforces
+  this, so `make lint` stays green on a violation. Fixtures under `tests/Acme*` and
+  `tests/Filter/ContentFilterCases/` stand in for third-party code and are left alone.
 
 ## Git
 

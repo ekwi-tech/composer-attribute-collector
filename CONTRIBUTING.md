@@ -18,6 +18,9 @@ porting by hand, but don't try to keep the trees mergeable.
 ## Pull Requests
 
 - **Code style** — We're following a [Coding Standard][]. Check the code style with `make lint`.
+  On top of it, and not enforced by any sniff: PHP's own functions and constants are called fully
+  qualified — `\is_file($path)`, `\DIRECTORY_SEPARATOR` — never imported with `use function` or
+  `use const`.
 - **Code health** — We're using [PHPStan][] to analyse the code, with maximum scrutiny. Check the code with `make lint`.
 - **Add tests!** — Your contribution won't be accepted if it does not have tests.
 - **Document any change in behaviour** — Make sure the `README.md` and any other relevant documentation are kept

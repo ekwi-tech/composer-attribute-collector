@@ -37,13 +37,6 @@ use PhpParser\Node\Param;
 use PHPUnit\Framework\TestCase;
 use ReflectionException;
 
-use function getcwd;
-use function is_string;
-use function str_contains;
-use function usort;
-
-use const PHP_VERSION_ID;
-
 abstract class CollectorTestAbstract extends TestCase
 {
     /**
@@ -58,7 +51,7 @@ abstract class CollectorTestAbstract extends TestCase
     {
         parent::setUp();
 
-        if (self::$initialized[get_called_class()] ?? false) {
+        if (self::$initialized[\get_called_class()] ?? false) {
             return;
         }
 
@@ -70,22 +63,22 @@ abstract class CollectorTestAbstract extends TestCase
         $this->assertFileExists($filepath);
         require $filepath;
 
-        self::$initialized[get_called_class()] = true;
+        self::$initialized[\get_called_class()] = true;
     }
 
     abstract protected static function dump(Config $config): void;
 
     private static function makeConfig(): Config
     {
-        $cwd = getcwd();
-        assert(is_string($cwd));
+        $cwd = \getcwd();
+        \assert(\is_string($cwd));
         $vendorDir = __DIR__ . '/sandbox';
         $filepath = "$vendorDir/attributes.php";
         $exclude = [
             "$cwd/tests/Acme/PSR4/IncompatibleSignature.php",
         ];
 
-        if (PHP_VERSION_ID < 80100) {
+        if (\PHP_VERSION_ID < 80100) {
             $exclude[] = "$cwd/tests/Acme81";
         }
 
@@ -314,7 +307,7 @@ abstract class CollectorTestAbstract extends TestCase
     public function testFilterTargetClasses(): void
     {
         $actual = Attributes::filterTargetClasses(
-            fn($attribute, $class) => str_contains($class, 'Menu'),
+            fn($attribute, $class) => \str_contains($class, 'Menu'),
         );
 
         $this->assertEquals([
@@ -505,7 +498,7 @@ abstract class CollectorTestAbstract extends TestCase
             $methods[] = [ $target->getAttributeClass(), $target->getName() ];
         }
 
-        usort($methods, fn($a, $b) => $a[1] <=> $b[1]);
+        \usort($methods, fn($a, $b) => $a[1] <=> $b[1]);
 
         return $methods;
     }
@@ -525,7 +518,7 @@ abstract class CollectorTestAbstract extends TestCase
             $methods[] = [ $target->getAttributeClass(), $target->getClass() . "::" . $target->getName() ];
         }
 
-        usort($methods, fn($a, $b) => $a[1] <=> $b[1]);
+        \usort($methods, fn($a, $b) => $a[1] <=> $b[1]);
 
         return $methods;
     }
@@ -548,7 +541,7 @@ abstract class CollectorTestAbstract extends TestCase
             ];
         }
 
-        usort($parameters, fn($a, $b) => $a[1] <=> $b[1]);
+        \usort($parameters, fn($a, $b) => $a[1] <=> $b[1]);
 
         return $parameters;
     }
@@ -568,7 +561,7 @@ abstract class CollectorTestAbstract extends TestCase
             $properties[] = [ $target->getAttributeClass(), $target->getClass() . "::" . $target->getName() ];
         }
 
-        usort($properties, fn($a, $b) => $a[1] <=> $b[1]);
+        \usort($properties, fn($a, $b) => $a[1] <=> $b[1]);
 
         return $properties;
     }
