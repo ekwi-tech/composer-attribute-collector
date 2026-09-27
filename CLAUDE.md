@@ -140,8 +140,15 @@ laravel) against PHP 8.0–8.5, so avoid syntax in the *generated* output that o
   one act, not the next one, and an instruction to make a change is not authorization to commit it:
   prepare the branch, the diff and the message, then stop.
 - Commit and PR titles follow conventional commits, since a squashed PR title becomes the commit
-  title on `main`. A body, when there is one, is two to four structured lines: no bug narrative, no
-  test report, no restatement of the history git already holds.
+  title on `main`. A commit body, when there is one, is two to four structured lines, no test
+  report. A PR body is written for the reviewer — context, what changes, why this approach, impact,
+  verification (what was checked, not its output; what to check by hand), screenshots — each
+  section only when it has content, and the repository's PR template wins where there is one; a
+  trivial change stays at two to four lines. Either way it ends with `Refs ekwi-tech/<repo>#N.` when
+  an issue exists — qualified, since issues live in `ekwi-core` and a bare `#N` points at this
+  repository — never `Closes`, `Fixes` or `Resolves`: closing the issue is the product owner's act.
+  Neither carries a bug narrative, a plea or tool name-dropping, nor restates the history git
+  already holds.
 - Never append a tool attribution footer, or a `Co-Authored-By` trailer naming a tool, to a commit,
   a PR body or an issue. A PR body ends on its last substantive line.
 - No `--assignee` is needed: the `assign-author` workflow assigns the author of every issue and
