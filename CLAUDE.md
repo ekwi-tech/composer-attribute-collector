@@ -145,8 +145,9 @@ laravel) against PHP 8.0–8.5, so avoid syntax in the *generated* output that o
   verification (what was checked, not its output; what to check by hand), screenshots — each
   section only when it has content, and the repository's PR template wins where there is one; a
   trivial change stays at two to four lines. Either way it ends with `Refs ekwi-tech/<repo>#N.` when
-  an issue exists — qualified, since issues live in `ekwi-core` and a bare `#N` points at this
-  repository — never `Closes`, `Fixes` or `Resolves`: closing the issue is the product owner's act.
+  an issue exists — qualified, since an issue lives in the repository whose code it is about, which
+  need not be the PR's, and a bare `#N` points at this one — never `Closes`, `Fixes` or `Resolves`:
+  closing the issue is the product owner's act.
   Neither carries a bug narrative, a plea or tool name-dropping, nor restates the history git
   already holds.
 - Never append a tool attribution footer, or a `Co-Authored-By` trailer naming a tool, to a commit,
