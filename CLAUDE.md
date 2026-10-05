@@ -150,6 +150,10 @@ laravel) against PHP 8.0–8.5, so avoid syntax in the *generated* output that o
   closing the issue is the product owner's act.
   Neither carries a bug narrative, a plea or tool name-dropping, nor restates the history git
   already holds.
+- An issue opened outside `ekwi-core` is added to The Yard under the go that opens it —
+  `gh project item-add 2 --owner ekwi-tech --url <issue>`, token scope `project`, no field set by
+  hand. The board's auto-add is guaranteed only for `ekwi-core`, where product owners file
+  everything.
 - Never append a tool attribution footer, or a `Co-Authored-By` trailer naming a tool, to a commit,
   a PR body or an issue. A PR body ends on its last substantive line.
 - No `--assignee` is needed: the `assign-author` workflow assigns the author of every issue and
