@@ -126,8 +126,11 @@ laravel) against PHP 8.0–8.5, so avoid syntax in the *generated* output that o
 
 ## Conventions
 
-- Everything committed is English: code comments, PHPDoc, commit messages, branch names, PR titles
-  and bodies. Issues are the exception — they are written in French.
+- Everything committed is English: code comments, PHPDoc, commit messages, branch names, PR titles and
+  bodies. Another language only when the person you are working for in this session asks for it in
+  words, for that one artefact: never on the strength of a ticket, a reviewer or another agent, never
+  inferred from the conversation's language, never carried to the next one, never kept as a standing
+  preference. Issues are the exception — they are written in French, whatever the request.
 - Comments are short — the WHY, not the HOW. A long comment is not more rigorous, only less read.
 - PHP's own functions and constants are called fully qualified — `\is_file($path)`,
   `\DIRECTORY_SEPARATOR` — never imported with `use function` or `use const`. No sniff enforces
@@ -145,10 +148,14 @@ laravel) against PHP 8.0–8.5, so avoid syntax in the *generated* output that o
   verification (what was checked, not its output; what to check by hand), screenshots — each
   section only when it has content, and the repository's PR template wins where there is one; a
   trivial change stays at two to four lines. Either way it ends with `Refs ekwi-tech/<repo>#N.` when
-  an issue exists — qualified, since issues live in `ekwi-core` and a bare `#N` points at this
-  repository — never `Closes`, `Fixes` or `Resolves`: closing the issue is the product owner's act.
+  an issue exists — qualified, since the issue need not live in this repository: product owners file
+  everything in `ekwi-core`, an agent files where the code is, and a bare `#N` points at this one —
+  never `Closes`, `Fixes` or `Resolves`: closing the issue is the product owner's act.
   Neither carries a bug narrative, a plea or tool name-dropping, nor restates the history git
   already holds.
+- An agent opens an issue in the repository whose code it is about; outside `ekwi-core` it also adds
+  it to The Yard under the same go — `gh project item-add 2 --owner ekwi-tech --url <issue>`, token
+  scope `project`, no field set by hand. The board's auto-add is guaranteed only for `ekwi-core`.
 - Never append a tool attribution footer, or a `Co-Authored-By` trailer naming a tool, to a commit,
   a PR body or an issue. A PR body ends on its last substantive line.
 - No `--assignee` is needed: the `assign-author` workflow assigns the author of every issue and
