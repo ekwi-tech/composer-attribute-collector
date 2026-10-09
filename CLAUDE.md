@@ -57,8 +57,14 @@ Two runtimes, deliberately separated:
    (`collector.php`, via `symfony/process`, which is not declared in `composer.json` and comes from
    Composer's own dependencies) to do the work. The subprocess isolation exists so that
    loading application classes for reflection cannot collide with Composer's own loaded
-   dependencies (see `cases/incompatible-signature`). `collector.php` unserializes the `Config`
-   (with `allowed_classes` restricted to `Config`), builds its own `Logger`, and runs `Collector`.
+   dependencies (see `cases/incompatible-signature`). `collector.php` requires `src/Config.php` by
+   hand, unserializes the `Config` (with `allowed_classes` restricted to `Config`), then loads the
+   project autoloader from `Config::$vendorDir`, builds its own `Logger`, and runs `Collector`. So
+   `Config` must stay declarable without an autoloader: no `extends`, `implements` or trait.
+   On a plugin update, Composer reloads `Plugin` alone and keeps the previous version of every other
+   class already loaded: call nothing from `Plugin` with named arguments, and never change such a
+   signature incompatibly. The `Config` serialized then comes from the previous class while the new
+   `collector.php` unserializes it, so a change to its properties yields one incomplete object.
 
 2. **Run time** — the generated `attributes.php` calls `Attributes::with(fn () => new Collection(…))`
    with plain nested arrays of class/method/property/parameter **names**. `Attributes` is a static
@@ -104,7 +110,10 @@ exactly what this fork removed. Adding a new target kind means touching both sid
 
 `Config::from()` resolves `vendor-dir`, defaults `include` to the root package's `autoload` paths
 (minus `attributes.php` itself), and applies `extra.composer-attribute-collector.include/exclude`
-with the `{vendor}` placeholder. Paths are absolute; `exclude` is compiled into a single regexp.
+with the `{vendor}` placeholder. It then appends what every installed package declares under
+`extra.composer-attribute-collector.expose.include/exclude`, relative to that package's install path
+(no placeholder, dev packages skipped outside dev mode); a dependency's own `include`/`exclude` is its
+root-time config and is never read. Paths are absolute; `exclude` is compiled into a single regexp.
 
 ## Tests
 

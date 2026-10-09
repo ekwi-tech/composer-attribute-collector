@@ -18,6 +18,7 @@ final class Config
     public const EXTRA = 'composer-attribute-collector';
     public const EXTRA_INCLUDE = 'include';
     public const EXTRA_EXCLUDE = 'exclude';
+    public const EXTRA_EXPOSE = 'expose';
     public const ENV_USE_CACHE = 'COMPOSER_ATTRIBUTE_COLLECTOR_USE_CACHE';
     public const FILENAME = 'attributes.php';
 
@@ -26,7 +27,7 @@ final class Config
      */
     public const VENDOR_PLACEHOLDER = '{vendor}';
 
-    public static function from(PartialComposer $composer, bool $isDebug = false): self
+    public static function from(PartialComposer $composer, bool $isDebug = false, bool $isDevMode = true): self
     {
         $vendorDir = self::resolveVendorDir($composer);
         $composerFile = Factory::getComposerFile();
@@ -49,6 +50,10 @@ final class Config
             $rootDir,
         );
         $exclude = self::expandPaths($extra[self::EXTRA_EXCLUDE] ?? [], $vendorDir, $rootDir);
+
+        [ $exposedInclude, $exposedExclude ] = self::resolveExposed($composer, $vendorDir, $isDevMode);
+        $include = \array_values(\array_unique([ ...$include, ...$exposedInclude ]));
+        $exclude = \array_values(\array_unique([ ...$exclude, ...$exposedExclude ]));
 
         $useCache = \filter_var(Platform::getEnv(self::ENV_USE_CACHE), \FILTER_VALIDATE_BOOL);
 
@@ -97,6 +102,104 @@ final class Config
         }
 
         return $include;
+    }
+
+    /**
+     * Collects what installed packages expose under `extra.composer-attribute-collector.expose`.
+     *
+     * Paths are relative to the package's install path, without the `{vendor}` placeholder. Dev
+     * packages are skipped outside dev mode, as the autoloader skips them.
+     *
+     * @return array{ non-empty-string[], non-empty-string[] }
+     *     The include and exclude paths.
+     */
+    private static function resolveExposed(PartialComposer $composer, string $vendorDir, bool $isDevMode): array
+    {
+        $repository = $composer->getRepositoryManager()->getLocalRepository();
+        $installationManager = $composer->getInstallationManager();
+        $devPackageNames = $isDevMode ? [] : $repository->getDevPackageNames();
+        // Installers realpath the vendor dir; put its raw form back so that `{vendor}` paths of the
+        // root, and the paths of the scanned files, keep matching.
+        $realVendorDir = \realpath($vendorDir) ?: $vendorDir;
+        $include = [];
+        $exclude = [];
+
+        foreach ($repository->getCanonicalPackages() as $package) {
+            if (\in_array($package->getName(), $devPackageNames, true)) {
+                continue;
+            }
+
+            $expose = self::readExpose($package);
+
+            if (!$expose) {
+                continue;
+            }
+
+            // A metapackage has no install path, hence nothing to scan.
+            $installPath = $installationManager->getInstallPath($package);
+
+            if (!$installPath) {
+                continue;
+            }
+
+            if (\str_starts_with($installPath, $realVendorDir . '/')) {
+                $installPath = $vendorDir . \substr($installPath, \strlen($realVendorDir));
+            }
+
+            $packageDir = \rtrim($installPath, '/\\') . \DIRECTORY_SEPARATOR;
+            $include = [ ...$include, ...self::prefixPaths($expose[self::EXTRA_INCLUDE], $packageDir) ];
+            $exclude = [ ...$exclude, ...self::prefixPaths($expose[self::EXTRA_EXCLUDE], $packageDir) ];
+        }
+
+        return [ $include, $exclude ];
+    }
+
+    /**
+     * A dependency's config is third-party input: a malformed one fails naming the package. Unknown
+     * keys are ignored, so that a newer plugin version may add some.
+     *
+     * @return array{ include: non-empty-string[], exclude: non-empty-string[] }|null
+     */
+    private static function readExpose(PackageInterface $package): ?array
+    {
+        $extra = $package->getExtra()[self::EXTRA] ?? null;
+
+        if (!\is_array($extra) || !\array_key_exists(self::EXTRA_EXPOSE, $extra)) {
+            return null;
+        }
+
+        $expose = $extra[self::EXTRA_EXPOSE];
+        $error = \sprintf(
+            'Invalid "extra.%s.%s" in package %s, expected {"%s": [paths], "%s": [paths]}',
+            self::EXTRA,
+            self::EXTRA_EXPOSE,
+            $package->getPrettyName(),
+            self::EXTRA_INCLUDE,
+            self::EXTRA_EXCLUDE,
+        );
+        $read = [ self::EXTRA_INCLUDE => [], self::EXTRA_EXCLUDE => [] ];
+
+        if (!\is_array($expose) || ($expose && \array_is_list($expose))) {
+            throw new InvalidArgumentException($error);
+        }
+
+        foreach (\array_keys($read) as $key) {
+            $paths = $expose[$key] ?? [];
+
+            if (!\is_array($paths) || !\array_is_list($paths)) {
+                throw new InvalidArgumentException($error);
+            }
+
+            foreach ($paths as $path) {
+                if (!\is_string($path) || $path === '') {
+                    throw new InvalidArgumentException($error);
+                }
+
+                $read[$key][] = $path;
+            }
+        }
+
+        return $read;
     }
 
     /**
@@ -160,9 +263,7 @@ final class Config
         $expanded = [];
 
         foreach ($paths as $path) {
-            if (\str_starts_with($path, "./")) {
-                $path = \substr($path, 2);
-            }
+            $path = self::trimDotSlash($path);
 
             if (\str_starts_with($path, self::VENDOR_PLACEHOLDER)) {
                 $path = $vendorDir . \substr($path, \strlen(self::VENDOR_PLACEHOLDER));
@@ -174,5 +275,22 @@ final class Config
         }
 
         return $expanded;
+    }
+
+    /**
+     * @param non-empty-string[] $paths
+     * @param non-empty-string $dir
+     *     Ends with a directory separator.
+     *
+     * @return non-empty-string[]
+     */
+    private static function prefixPaths(array $paths, string $dir): array
+    {
+        return \array_map(fn (string $path) => $dir . self::trimDotSlash($path), $paths);
+    }
+
+    private static function trimDotSlash(string $path): string
+    {
+        return \str_starts_with($path, "./") ? \substr($path, 2) : $path;
     }
 }

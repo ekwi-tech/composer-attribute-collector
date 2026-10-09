@@ -21,8 +21,8 @@ analysis. (For known targets, traditional reflection remains an option.)
 
 ## Differences from upstream
 
-A handful of deliberate changes; everything else—configuration, caching, the generated file, the
-`Attributes` facade—behaves like [upstream][].
+A handful of deliberate changes; everything else—the rest of the configuration, caching, the
+generated file, the `Attributes` facade—behaves like [upstream][].
 
 ### 1. Collection is opt-in
 
@@ -70,6 +70,13 @@ The generated "attributes" file names those classes too, but it is rewritten on 
 > The fork does not `replace` the upstream package: Composer will happily install both, and both
 > plugins would then write `vendor/attributes.php`, each undoing the other. Require one or the
 > other, never the two together.
+
+### 6. Dependencies expose their own paths
+
+Upstream only reads the root `composer.json`, so collecting attributes from dependencies means
+listing their paths there, wildcards included. Here each installed package can declare under
+`expose` the paths to scan in the projects requiring it. See
+[Exposing paths to consumers](#exposing-paths-to-consumers-dependencies).
 
 
 
@@ -231,7 +238,8 @@ final class MyAttribute
 
 The collector automatically scans `autoload` paths of the root `composer.json` for a
 zero-configuration experience. You can override them via
-`extra.composer-attribute-collector.include`.
+`extra.composer-attribute-collector.include`. Dependencies add the paths they
+[expose](#exposing-paths-to-consumers-dependencies).
 
 ```json
 {
@@ -319,6 +327,43 @@ replaced with the path to the vendor folder.
   }
 }
 ```
+
+### Exposing paths to consumers (dependencies)
+
+`include` and `exclude` only apply when a package is the root. A package that wants its own
+attributes collected in the projects requiring it declares them under `expose`, which the
+collector reads from every installed package and merges with the root configuration:
+
+```json
+{
+  "extra": {
+    "composer-attribute-collector": {
+      "include": [
+        "src",
+        "tests"
+      ],
+      "expose": {
+        "include": [
+          "src"
+        ],
+        "exclude": [
+          "src/Legacy.php"
+        ]
+      }
+    }
+  }
+}
+```
+
+The paths are relative to the package's own directory; the `{vendor}` placeholder is not expanded.
+A package without `expose` is not scanned, and dev packages are skipped when autoloading without dev
+dependencies. The root `exclude` still applies to exposed paths.
+
+A root `{vendor}/…` wildcard can go once every package it covers exposes its paths; until then, the
+overlap only costs a second scan.
+
+The deprecated `target-dir` option is not supported: the exposed paths of a package installed with it
+would resolve under its target directory.
 
 ### Cache discoveries between runs
 
