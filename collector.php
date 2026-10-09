@@ -3,7 +3,8 @@
 
 namespace Ekwi\ComposerAttributeCollector;
 
-require 'vendor/autoload.php';
+// The autoloader lives in the configured vendor dir, which is only known once the config is read.
+require_once __DIR__ . '/src/Config.php';
 
 $configFile = $argv[1]
     ?? throw new \Exception("Configuration file is missing");
@@ -17,6 +18,12 @@ $config = \unserialize($serializedConfig, [
         Config::class,
     ],
 ]);
+
+if (!$config instanceof Config) {
+    throw new \Exception("Unable to unserialize configuration");
+}
+
+require_once $config->vendorDir . '/autoload.php';
 
 $log = new class($config->isDebug) implements Logger
 {

@@ -72,8 +72,9 @@ abstract class CollectorTestAbstract extends TestCase
     {
         $cwd = \getcwd();
         \assert(\is_string($cwd));
-        $vendorDir = __DIR__ . '/sandbox';
-        $filepath = "$vendorDir/attributes.php";
+        // The subprocess loads its autoloader from the vendor dir, so it must be a real one.
+        $vendorDir = "$cwd/vendor";
+        $filepath = __DIR__ . '/sandbox/attributes.php';
         $exclude = [
             "$cwd/tests/Acme/PSR4/IncompatibleSignature.php",
         ];

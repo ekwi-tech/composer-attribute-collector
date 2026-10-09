@@ -71,7 +71,9 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
     {
         $composer = $event->getComposer();
         $io = $event->getIO();
-        $config = Config::from($composer, isDebug: $io->isDebug());
+        // Positional on purpose: on a plugin update, Composer reloads this class only, and it may
+        // call the previous Config::from(), which would reject an unknown named argument.
+        $config = Config::from($composer, $io->isDebug(), $event->isDevMode());
 
         require_once $config->vendorDir . "/autoload.php";
 
