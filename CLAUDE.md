@@ -79,22 +79,29 @@ Two runtimes, deliberately separated:
 (hand-rolled export into the PHP file: short arrays, no numeric keys on lists, `var_export` used
 only to quote individual strings).
 
-- `IncludePath::unscannableReason()` rejects, before the scan, a path that `ClassMapGenerator` would throw
-  on — one that is neither a file nor a directory, or a wildcard matching no *directory* (Finder resolves it
-  with `GLOB_ONLYDIR`, so `src/*.php` is unscannable). That prediction duplicates a contract owned by
-  `composer/class-map-generator` and `symfony/finder`, which is not even declared here; `IncludePathTest`
-  pins it against the real generator and fails the day either stops agreeing.
+- `IncludePath::unscannableReason()` rejects, before the scan, a path that `ClassMapGenerator` would
+  throw on — one that is neither a file nor a directory, or a wildcard matching no *directory*
+  (Finder resolves it with `GLOB_ONLYDIR`, so `src/*.php` is unscannable). That prediction
+  duplicates a contract owned by `composer/class-map-generator` and `symfony/finder`, which is not
+  even declared here; `IncludePathTest` pins it against the real generator and fails the day either
+  stops agreeing. `IncludePath::resolve()` lists what such a path stands for, which the class map
+  cache watches.
 - `ContentFilter` reads the file as **plain text**: no `#[` means skip, and a file that looks like
   it declares an attribute class is skipped. This is why a class inheriting attributes from a trait
   needs `#[InheritsAttributes]` to be seen at all.
 - The three `Memoize*` classes each own one key in a `Datastore` (`classmap`, `filtered`,
-  `attributes`) and invalidate per-file by `filemtime`. They also prune entries for paths/classes
-  that disappeared. `Datastore` is `RuntimeDatastore` (throwaway) unless
+  `attributes`) and invalidate on a `filemtime` that differs from the stored one — equality, not
+  recency, since an archive extracted in place can restore older mtimes. The class map is stored per
+  include path with the exclusion regexp and a fingerprint: the mtimes of the files the generator
+  scans and of their directories. An edited exclusion or a new wildcard match rescans it too;
+  without the cache, there is no fingerprint and every include is rescanned. They also prune entries
+  for paths/classes that disappeared. `Datastore` is `RuntimeDatastore` (throwaway) unless
   `COMPOSER_ATTRIBUTE_COLLECTOR_USE_CACHE` is truthy, then `FileDatastore` writes serialized state
-  to `.composer-attribute-collector/v{MAJOR}-{MINOR}-{key}`.
-- **Bump `Plugin::VERSION_MINOR` when you change the shape of anything stored in the datastore**
-  (the `Transient*` DTOs, the memoize state tuples). The version is the cache-busting mechanism;
-  stale data of the wrong shape is otherwise unserialized and used.
+  to `.composer-attribute-collector/format-{N}-{key}`.
+- **Bump `Plugin::CACHE_FORMAT` when you change the shape or meaning of anything stored in the
+  datastore** (the `Transient*` DTOs, the memoize state tuples). It is the cache-busting mechanism,
+  unrelated to the plugin's version; stale data of the wrong shape is otherwise unserialized and
+  used.
 
 ### Transient vs. final targets
 
@@ -128,10 +135,16 @@ root-time config and is never read. Paths are absolute; `exclude` is compiled in
 
 ## Use cases (`cases/`)
 
-Each case is a standalone app pinning the plugin via a `path` repository. `make plugin-copy` copies
-`src/`, `composer.json`, and `collector.php` into `cases/<name>/composer-attribute-collector/` —
-required before `composer install` there. CI runs all three (incompatible-signature, symfony,
-laravel) against PHP 8.0–8.5, so avoid syntax in the *generated* output that older PHP can't parse.
+Each case is a standalone app with a `path` repository on
+`cases/<name>/composer-attribute-collector/`, which `make plugin-copy` fills with `src/`,
+`composer.json`, and `collector.php`. CI runs all three
+(incompatible-signature, symfony, laravel) against PHP 8.4 and 8.5.
+
+**They do not exercise this fork.** They still require `olvlvl/composer-attribute-collector`, which
+the copied package — named `ekwi-tech/composer-attribute-collector`, without a `replace` — does not
+provide, so Composer installs upstream from Packagist. Don't align `cases/*/test.php` on the fork's
+API: that breaks CI. Rewiring them means requiring the fork by its name and giving them attributes
+marked `#[CollectableAttribute]`.
 
 ## Conventions
 

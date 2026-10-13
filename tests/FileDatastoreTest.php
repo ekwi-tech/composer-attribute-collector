@@ -79,7 +79,7 @@ final class FileDatastoreTest extends TestCase
 
     private static function write(string $str): void
     {
-        $filename = self::DIR . 'v' . Plugin::VERSION_MAJOR . '-' . Plugin::VERSION_MINOR . '-' . self::KEY;
+        $filename = self::DIR . 'format-' . Plugin::CACHE_FORMAT . '-' . self::KEY;
 
         \file_put_contents($filename, $str);
     }

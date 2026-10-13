@@ -20,7 +20,7 @@ class MemoizeAttributeCollector
      *     array<TransientTargetParameter>,
      * }>
      *     Where _key_ is a class and _value_ is an array where:
-     *     - `0` is a timestamp
+     *     - `0` is the mtime of its file as of collection
      */
     private array $state;
 
@@ -47,19 +47,21 @@ class MemoizeAttributeCollector
             $filterClasses[$class] = true;
 
             [
-                $timestamp,
+                $previousMtime,
                 $classAttributes,
                 $methodAttributes,
                 $propertyAttributes,
                 $parameterAttributes,
-            ] = $this->state[$class] ?? [ 0, [], [], [], [] ];
+            ] = $this->state[$class] ?? [ null, [], [], [], [] ];
 
             $mtime = \filemtime($filepath);
 
-            if ($timestamp < $mtime) {
-                if ($timestamp) {
-                    $diff = $mtime - $timestamp;
-                    $this->log->debug("Refresh attributes of class '$class' in '$filepath' ($diff sec ago)");
+            \assert(\is_int($mtime));
+
+            // Equality, not recency: an archive extracted in place can restore an older mtime.
+            if ($mtime !== $previousMtime) {
+                if ($previousMtime !== null) {
+                    $this->log->debug("Refresh attributes of class '$class' in '$filepath' (modified)");
                 } else {
                     $this->log->debug("Collect attributes of class '$class' in '$filepath'");
                 }
@@ -78,7 +80,7 @@ class MemoizeAttributeCollector
                 }
 
                 $this->state[$class] = [
-                    \time(),
+                    $mtime,
                     $classAttributes,
                     $methodAttributes,
                     $propertyAttributes,

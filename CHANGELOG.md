@@ -25,6 +25,40 @@ None
 
 ### Other Changes
 
+With the cache enabled (`COMPOSER_ATTRIBUTE_COLLECTOR_USE_CACHE`), the class map no longer misses:
+
+- a changed `exclude` or `expose.exclude`, which had no effect until a scanned directory changed;
+- what a wildcard include, such as `{vendor}/acme/*/src`, matches: its class map was never
+  refreshed once cached, or the second dump failed on an assertion when `zend.assertions` was on;
+- a file edited in place, since only directories were watched.
+
+Every cached step now compares a file's mtime with the one it last saw, rather than with the time of
+the last run: an archive extracted in place can restore older mtimes. Cache files from earlier
+versions (`v{major}-{minor}-*`) are ignored and can be deleted.
+
+
+## 3.1.0
+
+### New Requirements
+
+None
+
+### New features
+
+An installed package can declare, under `extra.composer-attribute-collector.expose`, the paths to
+scan in the projects requiring it and the paths to keep out. See "Exposing paths to consumers" in
+the README.
+
+### Deprecated Features
+
+None
+
+### Backward Incompatible Changes
+
+None
+
+### Other Changes
+
 An include path that cannot be resolved is now skipped, with a warning, instead of aborting the
 autoload dump. This covers a literal path that is neither a file nor a directory, and a wildcard
 pattern matching no directory. A path that legitimately exists in one install context and not

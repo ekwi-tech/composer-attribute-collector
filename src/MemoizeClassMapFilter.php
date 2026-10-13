@@ -13,6 +13,7 @@ class MemoizeClassMapFilter
 
     /**
      * @var array<non-empty-string, array{ int, bool }>
+     *     Where _key_ is a pathname and _value_ its mtime as of filtering, and whether it was kept.
      */
     private array $state;
 
@@ -38,22 +39,22 @@ class MemoizeClassMapFilter
 
         foreach ($classMap as $class => $pathname) {
             $paths[$pathname] = true;
-            [ $timestamp, $keep ] = $this->state[$pathname] ?? [ 0, false ];
+            [ $previousMtime, $keep ] = $this->state[$pathname] ?? [ null, false ];
 
             $mtime = \filemtime($pathname);
 
             \assert(\is_int($mtime));
 
-            if ($timestamp < $mtime) {
-                if ($timestamp) {
-                    $diff = $mtime - $timestamp;
-                    $this->io->debug("Refresh filtered file '$pathname' ($diff sec ago)");
+            // Equality, not recency: an archive extracted in place can restore an older mtime.
+            if ($mtime !== $previousMtime) {
+                if ($previousMtime !== null) {
+                    $this->io->debug("Refresh filtered file '$pathname' (modified)");
                 } else {
                     $this->io->debug("Filter '$pathname'");
                 }
 
                 $keep = $filter($class, $pathname);
-                $this->state[$pathname] = [ \time(), $keep ];
+                $this->state[$pathname] = [ $mtime, $keep ];
             }
 
             if ($keep) {

@@ -33,7 +33,7 @@ final class Collector
         //
         $start = \microtime(true);
         $datastore = $this->buildDefaultDatastore();
-        $classMapGenerator = new MemoizeClassMapGenerator($datastore, $log);
+        $classMapGenerator = new MemoizeClassMapGenerator($datastore, $log, fingerprints: $config->useCache);
         $skipped = 0;
         foreach ($config->include as $include) {
             $reason = IncludePath::unscannableReason($include);
