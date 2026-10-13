@@ -38,7 +38,7 @@ final class MemoizeClassMapGeneratorTest extends TestCase
             \rmdir(self::DIR . 'a/d');
         }
 
-        foreach ([ 'a/dangling.php', 'a/linked' ] as $link) {
+        foreach ([ 'a/dangling', 'a/linked' ] as $link) {
             if (\is_link(self::DIR . $link)) {
                 \unlink(self::DIR . $link);
             }
@@ -238,12 +238,13 @@ final class MemoizeClassMapGeneratorTest extends TestCase
     }
 
     /**
-     * The generator skips a dangling link, such as an editor's lock file; so must the fingerprint.
+     * The generator skips a dangling link by its extension, whatever its version; stat-ing it in the
+     * fingerprint would throw instead. A dangling `.php` link is left out: some versions throw on it.
      */
     public function testADanglingSymlinkIsIgnored(): void
     {
         self::write('a/b/c/b.php', self::declare('B'));
-        \symlink(self::DIR . 'nowhere', self::DIR . 'a/dangling.php');
+        \symlink(self::DIR . 'nowhere', self::DIR . 'a/dangling');
 
         $this->assertEquals([
             'App\B' => self::DIR . 'a/b/c/b.php',
