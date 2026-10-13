@@ -78,6 +78,46 @@ final class IncludePathTest extends TestCase
     }
 
     /**
+     * The cache watches what `resolve()` lists, so that list must be exactly what the generator scans: the
+     * path scanned at once and its resolved paths scanned one by one must find the same classes.
+     *
+     * @dataProvider provideScannablePath
+     */
+    public function testResolveListsWhatTheClassMapGeneratorScans(string $path, int $expectedCount): void
+    {
+        $path = self::root() . $path;
+        $resolved = IncludePath::resolve($path);
+
+        $whole = new ClassMapGenerator();
+        $whole->scanPaths($path);
+
+        $oneByOne = new ClassMapGenerator();
+
+        foreach ($resolved as $p) {
+            $oneByOne->scanPaths($p);
+        }
+
+        $this->assertCount($expectedCount, $resolved);
+        $this->assertNotEmpty($whole->getClassMap()->getMap());
+        $this->assertEquals($whole->getClassMap()->getMap(), $oneByOne->getClassMap()->getMap());
+    }
+
+    /**
+     * @return array<string, array{ string, int }>
+     */
+    public static function provideScannablePath(): array
+    {
+        return [
+
+            'a directory' => [ '/tests/Acme/PSR4/Presentation', 1 ],
+            'a file' => [ '/tests/Acme/PSR4/CreateMenuHandler.php', 1 ],
+            'a wildcard matching several directories' => [ '/tests/Acme/PSR4/*', 3 ],
+            'a wildcard matching several packages' => [ '/tests/Acme*/PSR4', 2 ],
+
+        ];
+    }
+
+    /**
      * @return non-empty-string
      */
     private static function root(): string

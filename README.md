@@ -357,7 +357,11 @@ collector reads from every installed package and merges with the root configurat
 
 The paths are relative to the package's own directory; the `{vendor}` placeholder is not expanded.
 A package without `expose` is not scanned, and dev packages are skipped when autoloading without dev
-dependencies. The root `exclude` still applies to exposed paths.
+dependencies.
+
+Exclusions apply both ways: the root `exclude` applies to exposed paths, and an exposed `exclude`
+applies to every scanned path, including those of the root `include`. A package can thus keep one of
+its paths out of its consumers' index, even when they cover it with a wildcard.
 
 A root `{vendor}/…` wildcard can go once every package it covers exposes its paths; until then, the
 overlap only costs a second scan.

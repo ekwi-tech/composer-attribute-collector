@@ -114,6 +114,44 @@ final class CollectorIncludeTest extends TestCase
         }
     }
 
+    /**
+     * The layout of a path repository: the package is symlinked into the vendor dir, and the root still scans
+     * it through a wildcard. The exclusion the package exposes must reach those files all the same.
+     */
+    public function testAnExposedExclusionFiltersARootWildcardOverASymlinkedPackage(): void
+    {
+        $dir = \sys_get_temp_dir() . \DIRECTORY_SEPARATOR . \uniqid('collector-include-test-');
+        $src = "$dir/package/src";
+        $installed = "$dir/vendor/acme/package";
+        $links = [ "$src/ActiveRecord", "$src/Presentation", $installed ];
+
+        try {
+            \mkdir($src, recursive: true);
+            \mkdir(\dirname($installed), recursive: true);
+            \symlink(self::cwd() . '/tests/Acme/PSR4/ActiveRecord', "$src/ActiveRecord");
+            \symlink(self::cwd() . '/tests/Acme/PSR4/Presentation', "$src/Presentation");
+            \symlink("$dir/package", $installed);
+
+            // The exclusion as Config::from() leaves it, under the package's install path.
+            self::dump([ "$dir/vendor/acme/*/src" ], new FakeLogger(), [ "$installed/src/Presentation" ]);
+        } finally {
+            foreach ($links as $link) {
+                if (\is_link($link)) {
+                    \unlink($link);
+                }
+            }
+
+            foreach ([ $src, "$dir/package", \dirname($installed), "$dir/vendor", $dir ] as $directory) {
+                if (\is_dir($directory)) {
+                    \rmdir($directory);
+                }
+            }
+        }
+
+        $this->assertStringContainsString('Acme\\\\PSR4\\\\ActiveRecord\\\\Article', self::generated());
+        $this->assertStringNotContainsString('Acme\\\\PSR4\\\\Presentation', self::generated());
+    }
+
     private static function generated(): string
     {
         self::assertFileExists(self::ATTRIBUTES_FILE);
@@ -123,14 +161,15 @@ final class CollectorIncludeTest extends TestCase
 
     /**
      * @param non-empty-string[] $include
+     * @param non-empty-string[] $exclude
      */
-    private static function dump(array $include, FakeLogger $log): void
+    private static function dump(array $include, FakeLogger $log, array $exclude = []): void
     {
         $config = new Config(
             vendorDir: __DIR__ . '/sandbox',
             attributesFile: self::ATTRIBUTES_FILE,
             include: $include,
-            exclude: [],
+            exclude: $exclude,
             useCache: false,
             isDebug: false,
         );

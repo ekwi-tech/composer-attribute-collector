@@ -75,9 +75,8 @@ final class FileDatastore implements Datastore
 
     private function formatFilename(string $key): string
     {
-        $major = Plugin::VERSION_MAJOR;
-        $minor = Plugin::VERSION_MINOR;
+        $format = Plugin::CACHE_FORMAT;
 
-        return $this->dir . \DIRECTORY_SEPARATOR . "v$major-$minor-$key";
+        return $this->dir . \DIRECTORY_SEPARATOR . "format-$format-$key";
     }
 }

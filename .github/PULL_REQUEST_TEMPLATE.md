@@ -10,7 +10,7 @@
      - Public API change? (Attributes::find*, the Target* classes, the collected attributes contract)
      - Plugin behaviour change a consumer notices at build/dump-autoload time?
      - composer.json change (name, require constraints)?
-     - Anything stored in the datastore? Then Plugin::VERSION_MINOR must be bumped.
+     - Anything stored in the datastore? Then Plugin::CACHE_FORMAT must be bumped.
 
      "Nothing — internal, docs or CI only" is a perfectly good answer. State it explicitly. -->
 

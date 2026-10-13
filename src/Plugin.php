@@ -15,8 +15,12 @@ use Symfony\Component\Process\Process;
 final class Plugin implements PluginInterface, EventSubscriberInterface
 {
     public const CACHE_DIR = '.composer-attribute-collector';
-    public const VERSION_MAJOR = 3;
-    public const VERSION_MINOR = 0;
+
+    /**
+     * The version of what the datastore holds, not of the plugin: bump it whenever that shape or meaning
+     * changes, or stale entries are unserialized and used as they are.
+     */
+    public const CACHE_FORMAT = 1;
 
     /**
      * @uses onPostAutoloadDump

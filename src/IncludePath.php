@@ -3,7 +3,7 @@
 namespace Ekwi\ComposerAttributeCollector;
 
 /**
- * Whether an include path can be handed to the class map generator.
+ * Whether an include path can be handed to the class map generator, and what it stands for.
  *
  * The prediction duplicates a contract that lives in two dependencies—{@link
  * \Composer\ClassMapGenerator\ClassMapGenerator::scanPaths()} throws on a path that is neither a file nor a
@@ -23,18 +23,33 @@ final class IncludePath
      */
     public static function unscannableReason(string $path): ?string
     {
-        if (\is_file($path) || \is_dir($path)) {
+        if (self::resolve($path)) {
             return null;
         }
 
+        return \str_contains($path, '*') ? 'it matches no directory' : 'it is neither a file nor a directory';
+    }
+
+    /**
+     * @return string[]
+     *     The file or directories the path stands for, sorted; empty when it is unscannable.
+     */
+    public static function resolve(string $path): array
+    {
+        if (\is_file($path) || \is_dir($path)) {
+            return [ $path ];
+        }
+
         if (!\str_contains($path, '*')) {
-            return 'it is neither a file nor a directory';
+            return [];
         }
 
         // The flags are those Finder uses to resolve the pattern. A wildcard matching only files, such as
         // `src/*.php`, matches no directory and has never been scannable.
         $flags = (\defined('GLOB_BRACE') ? \GLOB_BRACE : 0) | \GLOB_ONLYDIR | \GLOB_NOSORT;
+        $matches = \glob($path, $flags) ?: [];
+        \sort($matches);
 
-        return \glob($path, $flags) ? null : 'it matches no directory';
+        return $matches;
     }
 }
