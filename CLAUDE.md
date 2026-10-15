@@ -172,7 +172,8 @@ marked `#[CollectableAttribute]`.
   trivial change stays at two to four lines. Either way it ends with `Refs ekwi-tech/<repo>#N.` when
   an issue exists — qualified, since the issue need not live in this repository: product owners file
   everything in `ekwi-core`, an agent files where the code is, and a bare `#N` points at this one —
-  never `Closes`, `Fixes` or `Resolves`: closing the issue is the product owner's act.
+  never `Closes`, `Fixes` or `Resolves`: a closed issue skips `PO Review` and `Ready to Deploy`,
+  since closing follows `Done`, set once the change runs on a client's instance.
   Neither carries a bug narrative, a plea or tool name-dropping, nor restates the history git
   already holds.
 - An agent opens an issue in the repository whose code it is about; outside `ekwi-core` it also adds
